@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-pencil-square"></i> Editar Registro #{{ registro.id }}
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('edit_record', id=registro.id) }}" id="formSoja">
+            <!-- Mesma estrutura do form.html, mas com valores preenchidos -->
+            <!-- 1. Identificação -->
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-person-badge"></i> 1. Identificação
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">NÚMERO PRODUTOR</label>
+                            <input type="text" name="numero_produtor" class="form-control" value="{{ registro.numero_produtor or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">REGIÃO</label>
+                            <input type="text" name="regiao" class="form-control" value="{{ registro.regiao or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">MUNICÍPIO</label>
+                            <input type="text" name="municipio" class="form-control" value="{{ registro.municipio or '' }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">MESO_IDR</label>
+                            <input type="text" name="meso_idr" class="form-control" value="{{ registro.meso_idr or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ÁREA COM SOJA (HA)</label>
+                            <input type="number" step="0.01" name="area_soja" class="form-control" value="{{ registro.area_soja }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">PRODUTIVIDADE MÉDIA (SC/HA)</label>
+                            <input type="number" step="0.01" name="produtividade_media" class="form-control" value="{{ registro.produtividade_media }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">CULTIVAR</label>
+                            <input type="text" name="cultivar" class="form-control" value="{{ registro.cultivar or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">BT</label>
+                            <select name="bt" class="form-select">
+                                <option value="">Selecione...</option>
+                                <option value="SIM" {% if registro.bt == 'SIM' %}selected{% endif %}>SIM</option>
+                                <option value="NÃO" {% if registro.bt == 'NÃO' %}selected{% endif %}>NÃO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">DATA DE PLANTIO</label>
+                            <input type="date" name="data_plantio" class="form-control" value="{{ registro.data_plantio or '' }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">DATA EMERGÊNCIA</label>
+                            <input type="date" name="data_emergencia" class="form-control" value="{{ registro.data_emergencia or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">HOUVE ADVERSIDADE</label>
+                            <select name="houve_adversidade" class="form-select">
+                                <option value="">Selecione...</option>
+                                <option value="SIM" {% if registro.houve_adversidade == 'SIM' %}selected{% endif %}>SIM</option>
+                                <option value="NÃO" {% if registro.houve_adversidade == 'NÃO' %}selected{% endif %}>NÃO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">QUAL ADVERSIDADE</label>
+                            <select name="qual_adversidade" class="form-select">
+                                <option value="">Selecione...</option>
+                                <option value="Seca" {% if registro.qual_adversidade == 'Seca' %}selected{% endif %}>Seca</option>
+                                <option value="Chuva excessiva" {% if registro.qual_adversidade == 'Chuva excessiva' %}selected{% endif %}>Chuva excessiva</option>
+                                <option value="Ventos Fortes" {% if registro.qual_adversidade == 'Ventos Fortes' %}selected{% endif %}>Ventos Fortes</option>
+                                <option value="Granizo" {% if registro.qual_adversidade == 'Granizo' %}selected{% endif %}>Granizo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">NOME COLETOR DAS INFORMAÇÕES</label>
+                            <input type="text" name="nome_coletor" class="form-control" value="{{ registro.nome_coletor or '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Unidade Municipal IDR-Paraná</label>
+                            <input type="text" name="unidade_municipal" class="form-control" value="{{ registro.unidade_municipal or '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Conhecimento MIP e MID -->
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-bug"></i> 2. Conhecimento MIP e MID
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th></th>
+                            <th>SIM</th>
+                            <th>NÃO</th>
+                        </tr>
+                        <tr>
+                            <td>Tem conhecimento sobre Manejo Integrado de Doenças_MID</td>
+                            <td><input type="radio" name="conhecimento_mid" value="SIM" class="form-check-input" {% if registro.conhecimento_mid == 'SIM' %}checked{% endif %}></td>
+                            <td><input type="radio" name="conhecimento_mid" value="NÃO" class="form-check-input" {% if registro.conhecimento_mid == 'NÃO' %}checked{% endif %}></td>
+                        </tr>
+                        <tr>
+                            <td>Utiliza Monitoramento de Doenças (MID) para tomada de decisão para controle</td>
+                            <td><input type="radio" name="utiliza_mid" value="SIM" class="form-check-input" {% if registro.utiliza_mid == 'SIM' %}checked{% endif %}></td>
+                            <td><input type="radio" name="utiliza_mid" value="NÃO" class="form-check-input" {% if registro.utiliza_mid == 'NÃO' %}checked{% endif %}></td>
+                        </tr>
+                        <tr>
+                            <td>Tem conhecimento sobre Manejo Integrado de Pragas_MIP</td>
+                            <td><input type="radio" name="conhecimento_mip" value="SIM" class="form-check-input" {% if registro.conhecimento_mip == 'SIM' %}checked{% endif %}></td>
+                            <td><input type="radio" name="conhecimento_mip" value="NÃO" class="form-check-input" {% if registro.conhecimento_mip == 'NÃO' %}checked{% endif %}></td>
+                        </tr>
+                        <tr>
+                            <td>Utiliza monitoramento de Pragas (MIP) para tomada de decisão para controle</td>
+                            <td><input type="radio" name="utiliza_mip" value="SIM" class="form-check-input" {% if registro.utiliza_mip == 'SIM' %}checked{% endif %}></td>
+                            <td><input type="radio" name="utiliza_mip" value="NÃO" class="form-check-input" {% if registro.utiliza_mip == 'NÃO' %}checked{% endif %}></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Informações sobre Controle Plantas Invasoras -->
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-flower1"></i> 3. Informações sobre Controle Plantas Invasoras
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Classe do Produto</th>
+                                <th>ALVO</th>
+                                <th>N° Aplicações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Herbicida dessecação</td>
+                                <td>
+                                    <select name="herbicida_dessecacao_alvo" class="form-select">
+                                        <option value="">Selecione...</option>
+                                        <option value="Folhas largas" {% if registro.herbicida_dessecacao_alvo == 'Folhas largas' %}selected{% endif %}>Folhas largas</option>
+                                        <option value="Folhas estreitas" {% if registro.herbicida_dessecacao_alvo == 'Folhas estreitas' %}selected{% endif %}>Folhas estreitas</option>
+                                        <option value="Folhas largas e estreitas" {% if registro.herbicida_dessecacao_alvo == 'Folhas largas e estreitas' %}selected{% endif %}>Folhas largas e estreitas</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" name="herbicida_dessecacao_aplicacoes" class="form-control" min="0" value="{{ registro.herbicida_dessecacao_aplicacoes }}"></td>
+                            </tr>
+                            <tr>
+                                <td>Herbicida pré emergente</td>
+                                <td>
+                                    <select name="herbicida_pre_alvo" class="form-select">
+                                        <option value="">Selecione...</option>
+                                        <option value="Folhas largas" {% if registro.herbicida_pre_alvo == 'Folhas largas' %}selected{% endif %}>Folhas largas</option>
+                                        <option value="Folhas estreitas" {% if registro.herbicida_pre_alvo == 'Folhas estreitas' %}selected{% endif %}>Folhas estreitas</option>
+                                        <option value="Folhas largas e estreitas" {% if registro.herbicida_pre_alvo == 'Folhas largas e estreitas' %}selected{% endif %}>Folhas largas e estreitas</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" name="herbicida_pre_aplicacoes" class="form-control" min="0" value="{{ registro.herbicida_pre_aplicacoes }}"></td>
+                            </tr>
+                            <tr>
+                                <td>Herbicida pós emergente</td>
+                                <td>
+                                    <select name="herbicida_pos_alvo" class="form-select">
+                                        <option value="">Selecione...</option>
+                                        <option value="Folhas largas" {% if registro.herbicida_pos_alvo == 'Folhas largas' %}selected{% endif %}>Folhas largas</option>
+                                        <option value="Folhas estreitas" {% if registro.herbicida_pos_alvo == 'Folhas estreitas' %}selected{% endif %}>Folhas estreitas</option>
+                                        <option value="Folhas largas e estreitas" {% if registro.herbicida_pos_alvo == 'Folhas largas e estreitas' %}selected{% endif %}>Folhas largas e estreitas</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" name="herbicida_pos_aplicacoes" class="form-control" min="0" value="{{ registro.herbicida_pos_aplicacoes }}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4.0. Pulverização inseticida com dessecante pré plantio -->
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-droplet"></i> 4.0. Pulverização inseticida com dessecante pré plantio da soja
+                </div>
+                <div class="card-body">
+                    {% set pre_plantio = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pre_plantio')|first %}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">DATA</label>
+                            <input type="date" name="data_pre_plantio" class="form-control" value="{{ pre_plantio.data if pre_plantio else '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ALVO</label>
+                            <select name="alvo_pre_plantio" class="form-select">
+                                <option value="">Selecione...</option>
+                                {% for inseto in insetos %}
+                                <option value="{{ inseto }}" {% if pre_plantio and pre_plantio.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.1 a 4.7. Pulverizações pós-emergência -->
+            {% for i in range(1, 8) %}
+            {% set pos = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pos_' ~ i)|first %}
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-droplet"></i> 4.{{ i }}. {{ i }}ª Pulverização após emergência (NÃO REPETIR O ALVO)
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">DATA</label>
+                            <input type="date" name="data_pos_{{ i }}" class="form-control" value="{{ pos.data if pos else '' }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">CLASSE DO PRODUTO</label>
+                            <select name="classe_pos_{{ i }}" class="form-select classe-produto">
+                                <option value="">Selecione...</option>
+                                <option value="Inseticida" {% if pos and pos.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
+                                <option value="Fungicida" {% if pos and pos.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
+                                <option value="Acaricida" {% if pos and pos.classe_produto == 'Acaricida' %}selected{% endif %}>Acaricida</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ALVO</label>
+                            <select name="alvo_pos_{{ i }}" class="form-select alvo-select">
+                                <option value="">Selecione a classe primeiro</option>
+                                {% if pos %}
+                                    {% if pos.classe_produto in ['Inseticida', 'Acaricida'] %}
+                                        {% for inseto in insetos %}
+                                        <option value="{{ inseto }}" {% if pos.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
+                                        {% endfor %}
+                                    {% elif pos.classe_produto == 'Fungicida' %}
+                                        {% for doenca in doencas %}
+                                        <option value="{{ doenca }}" {% if pos.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- 5. Outras informações -->
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-info-circle"></i> 5. Outras informações
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td>FOI UTILIZADO INSETICIDA/FUNGICIDA PARA TRATAMENTO DE SEMENTES</td>
+                            <td><input type="radio" name="tratamento_sementes" value="SIM" class="form-check-input" {% if registro.tratamento_sementes == 'SIM' %}checked{% endif %}> SIM</td>
+                            <td><input type="radio" name="tratamento_sementes" value="NÃO" class="form-check-input" {% if registro.tratamento_sementes == 'NÃO' %}checked{% endif %}> NÃO</td>
+                        </tr>
+                        <tr>
+                            <td>FOI UTILIZADO SAL NA MISTURA DE INSETICIDA P/ PERCEVEJO</td>
+                            <td><input type="radio" name="sal_mistura" value="SIM" class="form-check-input" {% if registro.sal_mistura == 'SIM' %}checked{% endif %}> SIM</td>
+                            <td><input type="radio" name="sal_mistura" value="NÃO" class="form-check-input" {% if registro.sal_mistura == 'NÃO' %}checked{% endif %}> NÃO</td>
+                        </tr>
+                        <tr>
+                            <td>ÁREA COM USO DE CONTROLE BIOLÓGICO</td>
+                            <td><input type="radio" name="controle_biologico" value="SIM" class="form-check-input" {% if registro.controle_biologico == 'SIM' %}checked{% endif %}> SIM</td>
+                            <td><input type="radio" name="controle_biologico" value="NÃO" class="form-check-input" {% if registro.controle_biologico == 'NÃO' %}checked{% endif %}> NÃO</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. Informações FBN -->
+            <div class="card mb-4">
+                <div class="card-header bg-light text-dark">
+                    <i class="bi bi-flower2"></i> 6. Informações FBN
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td>Utiliza inoculação de sementes</td>
+                            <td><input type="radio" name="inoculacao_sementes" value="SIM" class="form-check-input" {% if registro.inoculacao_sementes == 'SIM' %}checked{% endif %}> SIM</td>
+                            <td><input type="radio" name="inoculacao_sementes" value="NÃO" class="form-check-input" {% if registro.inoculacao_sementes == 'NÃO' %}checked{% endif %}> NÃO</td>
+                        </tr>
+                        <tr>
+                            <td>Qual a forma de Inoculação da semente</td>
+                            <td colspan="2">
+                                <select name="forma_inoculacao" class="form-select">
+                                    <option value="">Selecione...</option>
+                                    <option value="Industrial" {% if registro.forma_inoculacao == 'Industrial' %}selected{% endif %}>Industrial</option>
+                                    <option value="Turfa na caixa de semente" {% if registro.forma_inoculacao == 'Turfa na caixa de semente' %}selected{% endif %}>Turfa na caixa de semente</option>
+                                    <option value="Misturador de semente" {% if registro.forma_inoculacao == 'Misturador de semente' %}selected{% endif %}>Misturador de semente</option>
+                                    <option value="Betoneira" {% if registro.forma_inoculacao == 'Betoneira' %}selected{% endif %}>Betoneira</option>
+                                    <option value="Lona" {% if registro.forma_inoculacao == 'Lona' %}selected{% endif %}>Lona</option>
+                                    <option value="No sulco" {% if registro.forma_inoculacao == 'No sulco' %}selected{% endif %}>No sulco</option>
+                                    <option value="Pulverizador no bag" {% if registro.forma_inoculacao == 'Pulverizador no bag' %}selected{% endif %}>Pulverizador no bag</option>
+                                    <option value="Outro" {% if registro.forma_inoculacao == 'Outro' %}selected{% endif %}>Outro</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Utiliza Coinculação com Bradyrhizobium e Azospirillum</td>
+                            <td><input type="radio" name="coinoculacao" value="SIM" class="form-check-input" {% if registro.coinoculacao == 'SIM' %}checked{% endif %}> SIM</td>
+                            <td><input type="radio" name="coinoculacao" value="NÃO" class="form-check-input" {% if registro.coinoculacao == 'NÃO' %}checked{% endif %}> NÃO</td>
+                        </tr>
+                        <tr>
+                            <td>Utiliza Co e Mo</td>
+                            <td><input type="radio" name="co_mo" value="SIM" class="form-check-input" {% if registro.co_mo == 'SIM' %}checked{% endif %}> SIM</td>
+                            <td><input type="radio" name="co_mo" value="NÃO" class="form-check-input" {% if registro.co_mo == 'NÃO' %}checked{% endif %}> NÃO</td>
+                        </tr>
+                        <tr>
+                            <td>O Co e Mo é utilizado como</td>
+                            <td colspan="2">
+                                <select name="co_mo_aplicacao" class="form-select">
+                                    <option value="">Selecione...</option>
+                                    <option value="Na semente" {% if registro.co_mo_aplicacao == 'Na semente' %}selected{% endif %}>Na semente</option>
+                                    <option value="Foliar" {% if registro.co_mo_aplicacao == 'Foliar' %}selected{% endif %}>Foliar</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg px-5">
+                    <i class="bi bi-save"></i> Atualizar
+                </button>
+                <a href="{{ url_for('view_record', id=registro.id) }}" class="btn btn-secondary btn-lg px-5">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Dados dos alvos
+    const insetos = {{ insetos|tojson }};
+    const doencas = {{ doencas|tojson }};
+    
+    // Função para atualizar opções de alvo baseado na classe selecionada
+    function atualizarAlvo(selectClasse) {
+        const row = selectClasse.closest('.row');
+        const alvoSelect = row.querySelector('.alvo-select');
+        const classe = selectClasse.value;
+        
+        alvoSelect.innerHTML = '<option value="">Selecione...</option>';
+        
+        if (classe === 'Inseticida' || classe === 'Acaricida') {
+            insetos.forEach(inseto => {
+                alvoSelect.innerHTML += `<option value="${inseto}">${inseto</option>`;
+            });
+        } else if (classe === 'Fungicida') {
+            doencas.forEach(doenca => {
+                alvoSelect.innerHTML += `<option value="${doenca}">${doenca}</option>`;
+            });
+        }
+    }
+    
+    // Adicionar event listeners para todos os selects de classe
+    document.querySelectorAll('.classe-produto').forEach(select => {
+        select.addEventListener('change', function() {
+            atualizarAlvo(this);
+        });
+    });
+</script>
+{% endblock %}
