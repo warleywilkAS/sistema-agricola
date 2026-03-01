@@ -444,13 +444,13 @@ function atualizarAlvoPre(selectClasse) {
         });
     });
     
-    // Event listener para pré-plantio
-    const selectPre = document.querySelector('.classe-produto-pre');
-    if (selectPre) {
-        selectPre.addEventListener('change', function() {
-            atualizarAlvoPre(this);
-        });
-    }
+    // Event listener para pré-plantio (com múltiplas seleções)
+const selectPre = document.querySelector('.classe-produto-pre');
+if (selectPre) {
+    selectPre.addEventListener('change', function() {
+        atualizarAlvoPre(this);
+    });
+}
     
     // ============================================
     // CÓDIGO DO BOTÃO DINÂMICO (NOVO)
