@@ -253,7 +253,11 @@ def edit_record(id):
             db.session.rollback()
             flash(f'Erro ao atualizar: {str(e)}', 'danger')
     
-    return render_template('edit_form.html', registro=registro, insetos=INSETOS_ALVO, doencas=DOENCAS_ALVO)
+    return render_template('form.html', 
+                      insetos=INSETOS_ALVO, 
+                      doencas=DOENCAS_ALVO,
+                      plantas=PLANTAS_DANINHAS,
+                      acaros=ACAROS)
 
 if __name__ == '__main__':
     with app.app_context():
