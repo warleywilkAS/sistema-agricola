@@ -118,39 +118,45 @@ def form():
             db.session.add(formulario)
             db.session.flush()  # Para obter o ID
             
-            # Salvar pulverizações
+                        # Salvar pulverizações
             # Pré-plantio com múltiplas classes
-if request.form.get('data_pre_plantio'):
-    classes_pre = request.form.getlist('classe_pre_plantio')
-    if classes_pre:
-        classe_pre_str = ', '.join(classes_pre)
-    else:
-        classe_pre_str = ''
-    
-    alvo_pre = request.form.get('alvo_pre_plantio')
-    
-    if classe_pre_str and alvo_pre:
-        pulv = Pulverizacao(
-            formulario_id=formulario.id,
-            tipo='pre_plantio',
-            data=request.form.get('data_pre_plantio'),
-            classe_produto=classe_pre_str,
-            alvo=alvo_pre
-        )
-        db.session.add(pulv)
+            if request.form.get('data_pre_plantio'):  # <--- AGORA COM INDENTAÇÃO CORRETA!
+                classes_pre = request.form.getlist('classe_pre_plantio')
+                if classes_pre:
+                    classe_pre_str = ', '.join(classes_pre)
+                else:
+                    classe_pre_str = ''
+                
+                alvo_pre = request.form.get('alvo_pre_plantio')
+                
+                if classe_pre_str and alvo_pre:
+                    pulv = Pulverizacao(
+                        formulario_id=formulario.id,
+                        tipo='pre_plantio',
+                        data=request.form.get('data_pre_plantio'),
+                        classe_produto=classe_pre_str,
+                        alvo=alvo_pre
+                    )
+                    db.session.add(pulv)
             
             # Pulverizações pós-emergência (até 7)
             for i in range(1, 8):
                 data = request.form.get(f'data_pos_{i}')
                 if data:
-                    classe = request.form.get(f'classe_pos_{i}')
+                    classes = request.form.getlist(f'classe_pos_{i}')
+                    if classes:
+                        classe_str = ', '.join(classes)
+                    else:
+                        classe_str = ''
+                    
                     alvo = request.form.get(f'alvo_pos_{i}')
-                    if classe and alvo:
+                    
+                    if classe_str and alvo:
                         pulv = Pulverizacao(
                             formulario_id=formulario.id,
                             tipo=f'pos_{i}',
                             data=data,
-                            classe_produto=classe,
+                            classe_produto=classe_str,
                             alvo=alvo
                         )
                         db.session.add(pulv)
