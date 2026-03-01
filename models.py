@@ -55,7 +55,7 @@ class FormularioSoja(db.Model):
 class Pulverizacao(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     formulario_id = db.Column(db.Integer, db.ForeignKey('formulario_soja.id'), nullable=False)
-    tipo = db.Column(db.String(50))  # pre_plantio, pos_1, pos_2, etc.
+    tipo = db.Column(db.String(50))
     data = db.Column(db.String(20))
-    classe_produto = db.Column(db.String(50))
+    classe_produto = db.Column(db.String(200))  # Agora vai armazenar como "Inseticida, Fungicida"
     alvo = db.Column(db.String(200))
