@@ -189,75 +189,173 @@
                 </div>
             </div>
 
-            <!-- 4.0. Pulverização inseticida com dessecante pré plantio -->
-            <div class="card mb-4">
-                <div class="card-header bg-light text-dark">
-                    <i class="bi bi-droplet"></i> 4.0. Pulverização inseticida com dessecante pré plantio da soja
-                </div>
-                <div class="card-body">
-                    {% set pre_plantio = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pre_plantio')|first %}
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">DATA</label>
-                            <input type="date" name="data_pre_plantio" class="form-control" value="{{ pre_plantio.data if pre_plantio else '' }}">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">ALVO</label>
-                            <select name="alvo_pre_plantio" class="form-select">
-                                <option value="">Selecione...</option>
+            <!-- 4.0. Pulverização com dessecante pré plantio -->
+<div class="card mb-4">
+    <div class="card-header bg-light text-dark">
+        <i class="bi bi-droplet"></i> 4.0. Pulverização com dessecante pré plantio da soja
+    </div>
+    <div class="card-body">
+        {% set pre_plantio = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pre_plantio')|first %}
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label class="form-label">DATA</label>
+                <input type="date" name="data_pre_plantio" class="form-control" value="{{ pre_plantio.data if pre_plantio else '' }}">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">CLASSE DO PRODUTO</label>
+                <select name="classe_pre_plantio" class="form-select classe-produto-pre">
+                    <option value="">Selecione...</option>
+                    <option value="Inseticida" {% if pre_plantio and pre_plantio.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
+                    <option value="Fungicida" {% if pre_plantio and pre_plantio.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
+                    <option value="Acaricida" {% if pre_plantio and pre_plantio.classe_produto == 'Acaricida' %}selected{% endif %}>Acaricida</option>
+                    <option value="Herbicida" {% if pre_plantio and pre_plantio.classe_produto == 'Herbicida' %}selected{% endif %}>Herbicida</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">ALVO (múltipla escolha)</label>
+                <select name="alvo_pre_plantio" class="form-select alvo-select-pre" multiple size="3">
+                    {% if pre_plantio and pre_plantio.classe_produto == 'Inseticida' %}
+                        {% for inseto in insetos %}
+                        <option value="{{ inseto }}" {% if pre_plantio.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
+                        {% endfor %}
+                    {% elif pre_plantio and pre_plantio.classe_produto == 'Fungicida' %}
+                        {% for doenca in doencas %}
+                        <option value="{{ doenca }}" {% if pre_plantio.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
+                        {% endfor %}
+                    {% elif pre_plantio and pre_plantio.classe_produto == 'Acaricida' %}
+                        {% for acaro in acaros %}
+                        <option value="{{ acaro }}" {% if pre_plantio.alvo == acaro %}selected{% endif %}>{{ acaro }}</option>
+                        {% endfor %}
+                    {% elif pre_plantio and pre_plantio.classe_produto == 'Herbicida' %}
+                        {% for planta in plantas %}
+                        <option value="{{ planta }}" {% if pre_plantio.alvo == planta %}selected{% endif %}>{{ planta }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Selecione a classe primeiro</option>
+                    {% endif %}
+                </select>
+                <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- 4. Pulverizações após emergência com botão dinâmico -->
+<div class="card mb-4">
+    <div class="card-header bg-light text-dark">
+        <i class="bi bi-droplet"></i> 4. Pulverizações após emergência
+    </div>
+    <div class="card-body">
+        <div id="pulverizacoes-container">
+            <!-- Primeira pulverização (sempre visível) -->
+            {% set pos1 = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pos_1')|first %}
+            <div class="pulverizacao-item mb-4 border-bottom pb-3">
+                <h6 class="text-success">1ª Pulverização após emergência</h6>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">DATA</label>
+                        <input type="date" name="data_pos_1" class="form-control" value="{{ pos1.data if pos1 else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">CLASSE DO PRODUTO</label>
+                        <select name="classe_pos_1" class="form-select classe-produto">
+                            <option value="">Selecione...</option>
+                            <option value="Inseticida" {% if pos1 and pos1.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
+                            <option value="Fungicida" {% if pos1 and pos1.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
+                            <option value="Acaricida" {% if pos1 and pos1.classe_produto == 'Acaricida' %}selected{% endif %}>Acaricida</option>
+                            <option value="Herbicida" {% if pos1 and pos1.classe_produto == 'Herbicida' %}selected{% endif %}>Herbicida</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ALVO (múltipla escolha)</label>
+                        <select name="alvo_pos_1" class="form-select alvo-select" multiple size="3">
+                            {% if pos1 and pos1.classe_produto == 'Inseticida' %}
                                 {% for inseto in insetos %}
-                                <option value="{{ inseto }}" {% if pre_plantio and pre_plantio.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
+                                <option value="{{ inseto }}" {% if pos1.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
                                 {% endfor %}
-                            </select>
-                        </div>
+                            {% elif pos1 and pos1.classe_produto == 'Fungicida' %}
+                                {% for doenca in doencas %}
+                                <option value="{{ doenca }}" {% if pos1.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
+                                {% endfor %}
+                            {% elif pos1 and pos1.classe_produto == 'Acaricida' %}
+                                {% for acaro in acaros %}
+                                <option value="{{ acaro }}" {% if pos1.alvo == acaro %}selected{% endif %}>{{ acaro }}</option>
+                                {% endfor %}
+                            {% elif pos1 and pos1.classe_produto == 'Herbicida' %}
+                                {% for planta in plantas %}
+                                <option value="{{ planta }}" {% if pos1.alvo == planta %}selected{% endif %}>{{ planta }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="">Selecione a classe primeiro</option>
+                            {% endif %}
+                        </select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
                     </div>
                 </div>
             </div>
 
-            <!-- 4.1 a 4.7. Pulverizações pós-emergência -->
-            {% for i in range(1, 8) %}
-            {% set pos = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pos_' ~ i)|first %}
-            <div class="card mb-4">
-                <div class="card-header bg-light text-dark">
-                    <i class="bi bi-droplet"></i> 4.{{ i }}. {{ i }}ª Pulverização após emergência (NÃO REPETIR O ALVO)
-                </div>
-                <div class="card-body">
+            <!-- Pulverizações adicionais existentes (serão carregadas aqui) -->
+            {% for i in range(2, 8) %}
+                {% set pos = registro.pulverizacoes|selectattr('tipo', 'equalto', 'pos_' ~ i)|first %}
+                {% if pos %}
+                <div class="pulverizacao-item mb-4 border-bottom pb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="text-success">{{ i }}ª Pulverização após emergência</h6>
+                        <button type="button" class="btn btn-sm btn-danger btn-remove-pulverizacao">
+                            <i class="bi bi-trash"></i> Remover
+                        </button>
+                    </div>
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label class="form-label">DATA</label>
-                            <input type="date" name="data_pos_{{ i }}" class="form-control" value="{{ pos.data if pos else '' }}">
+                            <input type="date" name="data_pos_{{ i }}" class="form-control" value="{{ pos.data }}">
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">CLASSE DO PRODUTO</label>
                             <select name="classe_pos_{{ i }}" class="form-select classe-produto">
                                 <option value="">Selecione...</option>
-                                <option value="Inseticida" {% if pos and pos.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
-                                <option value="Fungicida" {% if pos and pos.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
-                                <option value="Acaricida" {% if pos and pos.classe_produto == 'Acaricida' %}selected{% endif %}>Acaricida</option>
+                                <option value="Inseticida" {% if pos.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
+                                <option value="Fungicida" {% if pos.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
+                                <option value="Acaricida" {% if pos.classe_produto == 'Acaricida' %}selected{% endif %}>Acaricida</option>
+                                <option value="Herbicida" {% if pos.classe_produto == 'Herbicida' %}selected{% endif %}>Herbicida</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">ALVO</label>
-                            <select name="alvo_pos_{{ i }}" class="form-select alvo-select">
-                                <option value="">Selecione a classe primeiro</option>
-                                {% if pos %}
-                                    {% if pos.classe_produto in ['Inseticida', 'Acaricida'] %}
-                                        {% for inseto in insetos %}
-                                        <option value="{{ inseto }}" {% if pos.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
-                                        {% endfor %}
-                                    {% elif pos.classe_produto == 'Fungicida' %}
-                                        {% for doenca in doencas %}
-                                        <option value="{{ doenca }}" {% if pos.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
-                                        {% endfor %}
-                                    {% endif %}
+                            <label class="form-label">ALVO (múltipla escolha)</label>
+                            <select name="alvo_pos_{{ i }}" class="form-select alvo-select" multiple size="3">
+                                {% if pos.classe_produto == 'Inseticida' %}
+                                    {% for inseto in insetos %}
+                                    <option value="{{ inseto }}" {% if pos.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
+                                    {% endfor %}
+                                {% elif pos.classe_produto == 'Fungicida' %}
+                                    {% for doenca in doencas %}
+                                    <option value="{{ doenca }}" {% if pos.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
+                                    {% endfor %}
+                                {% elif pos.classe_produto == 'Acaricida' %}
+                                    {% for acaro in acaros %}
+                                    <option value="{{ acaro }}" {% if pos.alvo == acaro %}selected{% endif %}>{{ acaro }}</option>
+                                    {% endfor %}
+                                {% elif pos.classe_produto == 'Herbicida' %}
+                                    {% for planta in plantas %}
+                                    <option value="{{ planta }}" {% if pos.alvo == planta %}selected{% endif %}>{{ planta }}</option>
+                                    {% endfor %}
                                 {% endif %}
                             </select>
+                            <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
                         </div>
                     </div>
                 </div>
-            </div>
+                {% endif %}
             {% endfor %}
-
+        </div>
+        
+        <div class="text-center mt-3">
+            <button type="button" id="btn-add-pulverizacao" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Adicionar mais uma pulverização
+            </button>
+        </div>
+        <input type="hidden" id="pulverizacoes-count" name="pulverizacoes-count" value="{{ registro.pulverizacoes|selectattr('tipo', 'equalto', 'pos_')|list|length }}">
+    </div>
+</div>
             <!-- 5. Outras informações -->
             <div class="card mb-4">
                 <div class="card-header bg-light text-dark">
@@ -354,28 +452,176 @@
     // Dados dos alvos
     const insetos = {{ insetos|tojson }};
     const doencas = {{ doencas|tojson }};
+    const plantas = {{ plantas|tojson }};
+    const acaros = {{ acaros|tojson }};
     
-    // Função para atualizar opções de alvo baseado na classe selecionada
+    // Função para atualizar opções de alvo para pulverizações pós-emergência
     function atualizarAlvo(selectClasse) {
         const row = selectClasse.closest('.row');
         const alvoSelect = row.querySelector('.alvo-select');
         const classe = selectClasse.value;
         
-        alvoSelect.innerHTML = '<option value="">Selecione...</option>';
+        alvoSelect.innerHTML = '';
+        alvoSelect.size = 5;
         
-        if (classe === 'Inseticida' || classe === 'Acaricida') {
-            insetos.forEach(inseto => {
-                alvoSelect.innerHTML += `<option value="${inseto}">${inseto</option>`;
+        if (classe === 'Inseticida') {
+            insetos.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
             });
         } else if (classe === 'Fungicida') {
-            doencas.forEach(doenca => {
-                alvoSelect.innerHTML += `<option value="${doenca}">${doenca}</option>`;
+            doencas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
             });
+        } else if (classe === 'Acaricida') {
+            acaros.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Herbicida') {
+            plantas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else {
+            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+            alvoSelect.size = 1;
         }
     }
     
-    // Adicionar event listeners para todos os selects de classe
+    // Função específica para pré-plantio
+    function atualizarAlvoPre(selectClasse) {
+        const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
+        const classe = selectClasse.value;
+        
+        alvoSelect.innerHTML = '';
+        alvoSelect.size = 5;
+        
+        if (classe === 'Inseticida') {
+            insetos.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Fungicida') {
+            doencas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Acaricida') {
+            acaros.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Herbicida') {
+            plantas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else {
+            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+            alvoSelect.size = 1;
+        }
+    }
+    
+    // Adicionar event listeners para selects de classe pós-emergência
     document.querySelectorAll('.classe-produto').forEach(select => {
+        select.addEventListener('change', function() {
+            atualizarAlvo(this);
+        });
+    });
+    
+    // Event listener para pré-plantio
+    const selectPre = document.querySelector('.classe-produto-pre');
+    if (selectPre) {
+        selectPre.addEventListener('change', function() {
+            atualizarAlvoPre(this);
+        });
+    }
+    
+    // ============================================
+    // CÓDIGO DO BOTÃO DINÂMICO
+    // ============================================
+    
+    // Contador de pulverizações
+    let pulverizacaoCount = parseInt(document.getElementById('pulverizacoes-count').value) || 1;
+    
+    // Verificar se o botão existe antes de adicionar evento
+    const btnAdd = document.getElementById('btn-add-pulverizacao');
+    if (btnAdd) {
+        btnAdd.addEventListener('click', function() {
+            pulverizacaoCount++;
+            
+            const container = document.getElementById('pulverizacoes-container');
+            const newItem = document.createElement('div');
+            newItem.className = 'pulverizacao-item mb-4 border-bottom pb-3';
+            newItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="text-success">${pulverizacaoCount}ª Pulverização após emergência</h6>
+                    <button type="button" class="btn btn-sm btn-danger btn-remove-pulverizacao">
+                        <i class="bi bi-trash"></i> Remover
+                    </button>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">DATA</label>
+                        <input type="date" name="data_pos_${pulverizacaoCount}" class="form-control">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">CLASSE DO PRODUTO</label>
+                        <select name="classe_pos_${pulverizacaoCount}" class="form-select classe-produto">
+                            <option value="">Selecione...</option>
+                            <option value="Inseticida">Inseticida</option>
+                            <option value="Fungicida">Fungicida</option>
+                            <option value="Acaricida">Acaricida</option>
+                            <option value="Herbicida">Herbicida</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ALVO (múltipla escolha)</label>
+                        <select name="alvo_pos_${pulverizacaoCount}" class="form-select alvo-select" multiple size="3">
+                            <option value="">Selecione a classe primeiro</option>
+                        </select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newItem);
+            
+            // Adicionar event listener para o novo select
+            newItem.querySelector('.classe-produto').addEventListener('change', function() {
+                atualizarAlvo(this);
+            });
+            
+            // Adicionar event listener para o botão remover
+            newItem.querySelector('.btn-remove-pulverizacao').addEventListener('click', function() {
+                newItem.remove();
+                renumerarPulverizacoes();
+            });
+            
+            document.getElementById('pulverizacoes-count').value = pulverizacaoCount;
+        });
+    }
+    
+    // Função para renumerar pulverizações após remoção
+    function renumerarPulverizacoes() {
+        const items = document.querySelectorAll('.pulverizacao-item');
+        items.forEach((item, index) => {
+            const newNumber = index + 1;
+            const title = item.querySelector('h6');
+            if (title) title.textContent = newNumber + 'ª Pulverização após emergência';
+            
+            const dataInput = item.querySelector('input[type="date"]');
+            if (dataInput) dataInput.name = `data_pos_${newNumber}`;
+            
+            const classeSelect = item.querySelector('.classe-produto');
+            if (classeSelect) classeSelect.name = `classe_pos_${newNumber}`;
+            
+            const alvoSelect = item.querySelector('.alvo-select');
+            if (alvoSelect) alvoSelect.name = `alvo_pos_${newNumber}`;
+        });
+        
+        pulverizacaoCount = items.length;
+        document.getElementById('pulverizacoes-count').value = pulverizacaoCount;
+    }
+    
+    // Aplicar event listeners para selects existentes (importante para edição)
+    document.querySelectorAll('.classe-produto').forEach(select => {
+        // Remover listeners antigos para não duplicar
+        select.removeEventListener('change', function() {});
         select.addEventListener('change', function() {
             atualizarAlvo(this);
         });
