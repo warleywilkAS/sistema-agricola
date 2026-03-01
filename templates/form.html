@@ -219,37 +219,50 @@
         </div>
     </div>
 </div>
-            <!-- 4.1 a 4.7. Pulverizações pós-emergência -->
-            {% for i in range(1, 8) %}
-            <div class="card mb-4">
-                <div class="card-header bg-light text-dark">
-                    <i class="bi bi-droplet"></i> 4.{{ i }}. {{ i }}ª Pulverização após emergência (NÃO REPETIR O ALVO)
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">DATA</label>
-                            <input type="date" name="data_pos_{{ i }}" class="form-control">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">CLASSE DO PRODUTO</label>
-                            <select name="classe_pos_{{ i }}" class="form-select classe-produto">
-                                <option value="">Selecione...</option>
-                                <option value="Inseticida">Inseticida</option>
-                                <option value="Fungicida">Fungicida</option>
-                                <option value="Acaricida">Acaricida</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">ALVO</label>
-                            <select name="alvo_pos_{{ i }}" class="form-select alvo-select">
-                                <option value="">Selecione a classe primeiro</option>
-                            </select>
-                        </div>
+            <!-- 4.1 a 4.7. Pulverizações pós-emergência com botão dinâmico -->
+<div class="card mb-4">
+    <div class="card-header bg-light text-dark">
+        <i class="bi bi-droplet"></i> 4. Pulverizações após emergência
+    </div>
+    <div class="card-body">
+        <div id="pulverizacoes-container">
+            <!-- Primeira pulverização (sempre visível) -->
+            <div class="pulverizacao-item mb-4 border-bottom pb-3">
+                <h6 class="text-success">1ª Pulverização após emergência</h6>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">DATA</label>
+                        <input type="date" name="data_pos_1" class="form-control">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">CLASSE DO PRODUTO</label>
+                        <select name="classe_pos_1" class="form-select classe-produto">
+                            <option value="">Selecione...</option>
+                            <option value="Inseticida">Inseticida</option>
+                            <option value="Fungicida">Fungicida</option>
+                            <option value="Acaricida">Acaricida</option>
+                            <option value="Herbicida">Herbicida</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ALVO (múltipla escolha)</label>
+                        <select name="alvo_pos_1" class="form-select alvo-select" multiple size="3">
+                            <option value="">Selecione a classe primeiro</option>
+                        </select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
                     </div>
                 </div>
             </div>
-            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-3">
+            <button type="button" id="btn-add-pulverizacao" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Adicionar mais uma pulverização
+            </button>
+        </div>
+        <input type="hidden" id="pulverizacoes-count" name="pulverizacoes-count" value="1">
+    </div>
+</div>
 
             <!-- 5. Outras informações -->
             <div class="card mb-4">
