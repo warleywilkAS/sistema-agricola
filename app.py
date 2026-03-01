@@ -176,10 +176,15 @@ def form():
                       plantas=PLANTAS_DANINHAS,
                       acaros=ACAROS)
 
-@app.route('/records')
-def view_records():
-    registros = FormularioSoja.query.order_by(FormularioSoja.data_criacao.desc()).all()
-    return render_template('view_records.html', registros=registros)
+@app.route('/record/<int:id>')
+def view_record(id):
+    registro = FormularioSoja.query.get_or_404(id)
+    return render_template('view_record.html', 
+                          registro=registro, 
+                          insetos=INSETOS_ALVO, 
+                          doencas=DOENCAS_ALVO,
+                          plantas=PLANTAS_DANINHAS,
+                          acaros=ACAROS)
 
 @app.route('/export/excel')
 def export_excel():
