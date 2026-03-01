@@ -119,16 +119,25 @@ def form():
             db.session.flush()  # Para obter o ID
             
             # Salvar pulverizações
-            # Pré-plantio
-            if request.form.get('data_pre_plantio'):
-                pulv = Pulverizacao(
-                    formulario_id=formulario.id,
-                    tipo='pre_plantio',
-                    data=request.form.get('data_pre_plantio'),
-                    classe_produto='Inseticida',
-                    alvo=request.form.get('alvo_pre_plantio')
-                )
-                db.session.add(pulv)
+            # Pré-plantio com múltiplas classes
+if request.form.get('data_pre_plantio'):
+    classes_pre = request.form.getlist('classe_pre_plantio')
+    if classes_pre:
+        classe_pre_str = ', '.join(classes_pre)
+    else:
+        classe_pre_str = ''
+    
+    alvo_pre = request.form.get('alvo_pre_plantio')
+    
+    if classe_pre_str and alvo_pre:
+        pulv = Pulverizacao(
+            formulario_id=formulario.id,
+            tipo='pre_plantio',
+            data=request.form.get('data_pre_plantio'),
+            classe_produto=classe_pre_str,
+            alvo=alvo_pre
+        )
+        db.session.add(pulv)
             
             # Pulverizações pós-emergência (até 7)
             for i in range(1, 8):
@@ -271,16 +280,25 @@ def edit_record(id):
             # Remover pulverizações antigas
             Pulverizacao.query.filter_by(formulario_id=registro.id).delete()
             
-            # Adicionar novas pulverizações
-            if request.form.get('data_pre_plantio'):
-                pulv = Pulverizacao(
-                    formulario_id=registro.id,
-                    tipo='pre_plantio',
-                    data=request.form.get('data_pre_plantio'),
-                    classe_produto='Inseticida',
-                    alvo=request.form.get('alvo_pre_plantio')
-                )
-                db.session.add(pulv)
+           # Pré-plantio com múltiplas classes
+if request.form.get('data_pre_plantio'):
+    classes_pre = request.form.getlist('classe_pre_plantio')
+    if classes_pre:
+        classe_pre_str = ', '.join(classes_pre)
+    else:
+        classe_pre_str = ''
+    
+    alvo_pre = request.form.get('alvo_pre_plantio')
+    
+    if classe_pre_str and alvo_pre:
+        pulv = Pulverizacao(
+            formulario_id=registro.id,
+            tipo='pre_plantio',
+            data=request.form.get('data_pre_plantio'),
+            classe_produto=classe_pre_str,
+            alvo=alvo_pre
+        )
+        db.session.add(pulv)
             
             for i in range(1, 8):
                 data = request.form.get(f'data_pos_{i}')
