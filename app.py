@@ -166,6 +166,51 @@ def view_records():
     registros = FormularioSoja.query.order_by(FormularioSoja.data_criacao.desc()).all()
     return render_template('view_records.html', registros=registros)
 
+@app.route('/export/excel')
+def export_excel():
+    # Buscar todos os registros
+    registros = FormularioSoja.query.order_by(FormularioSoja.data_criacao.desc()).all()
+    
+    # Preparar dados para o Excel
+    dados = []
+    for r in registros:
+        # Contar pulverizações
+        pulverizacoes_count = len(r.pulverizacoes)
+        alvos = ', '.join([f"{p.classe_produto}: {p.alvo}" for p in r.pulverizacoes[:3]])
+        
+        dados.append({
+            'ID': r.id,
+            'Data Criação': r.data_criacao.strftime('%d/%m/%Y %H:%M'),
+            'Produtor': r.numero_produtor,
+            'Município': r.municipio,
+            'Área (ha)': r.area_soja,
+            'Produtividade': r.produtividade_media,
+            'Cultivar': r.cultivar,
+            'BT': r.bt,
+            'Data Plantio': r.data_plantio,
+            'Adversidade': r.qual_adversidade,
+            'N° Pulverizações': pulverizacoes_count,
+            'Principais Alvos': alvos,
+            'Coletor': r.nome_coletor
+        })
+    
+    # Criar DataFrame
+    df = pd.DataFrame(dados)
+    
+    # Criar arquivo Excel em memória
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Registros Soja', index=False)
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        download_name='registros_soja.xlsx',
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
 @app.route('/record/<int:id>')
 def view_record(id):
     registro = FormularioSoja.query.get_or_404(id)
