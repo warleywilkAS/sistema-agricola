@@ -299,7 +299,6 @@ else:
         classe_produto=classe_str,
         alvo=alvo
     )
-                        )
                         db.session.add(pulv)
             
             db.session.commit()
