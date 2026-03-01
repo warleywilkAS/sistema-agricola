@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-table"></i> Registros Salvos</span>
+        <a href="{{ url_for('export_excel') }}" class="btn btn-success btn-sm">
+            <i class="bi bi-file-excel"></i> Exportar para Excel
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Produtor</th>
+                        <th>Município</th>
+                        <th>Cultivar</th>
+                        <th>Área (ha)</th>
+                        <th>Produtividade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro.id }}</td>
+                        <td>{{ registro.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ registro.numero_produtor or '-' }}</td>
+                        <td>{{ registro.municipio or '-' }}</td>
+                        <td>{{ registro.cultivar or '-' }}</td>
+                        <td>{{ registro.area_soja or 0 }}</td>
+                        <td>{{ registro.produtividade_media or 0 }}</td>
+                        <td>
+                            <a href="{{ url_for('view_record', id=registro.id) }}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ url_for('edit_record', id=registro.id) }}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button onclick="excluirRegistro({{ registro.id }})" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação de exclusão -->
+<div class="modal fade" id="modalExcluir" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este registro?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="formExcluir" method="POST" action="">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function excluirRegistro(id) {
+    const form = document.getElementById('formExcluir');
+    form.action = `/delete/${id}`;
+    new bootstrap.Modal(document.getElementById('modalExcluir')).show();
+}
+</script>
+{% endblock %}
