@@ -187,6 +187,11 @@ def view_record(id):
                           plantas=PLANTAS_DANINHAS,
                           acaros=ACAROS)
 
+@app.route('/records')
+def view_records():
+    registros = FormularioSoja.query.order_by(FormularioSoja.data_criacao.desc()).all()
+    return render_template('view_records.html', registros=registros)
+
 @app.route('/export/excel')
 def export_excel():
     # Buscar todos os registros
