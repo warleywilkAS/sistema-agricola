@@ -396,7 +396,6 @@
     
     // Função específica para pré-plantio
     function atualizarAlvoPre(selectClasse) {
-        const row = selectClasse.closest('.row');
         const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
         const classe = selectClasse.value;
         
@@ -438,6 +437,96 @@
         selectPre.addEventListener('change', function() {
             atualizarAlvoPre(this);
         });
+    }
+    
+    // ============================================
+    // CÓDIGO DO BOTÃO DINÂMICO (NOVO)
+    // ============================================
+    
+    // Contador de pulverizações
+    let pulverizacaoCount = 1;
+    
+    // Verificar se o botão existe antes de adicionar evento
+    const btnAdd = document.getElementById('btn-add-pulverizacao');
+    if (btnAdd) {
+        btnAdd.addEventListener('click', function() {
+            pulverizacaoCount++;
+            
+            const container = document.getElementById('pulverizacoes-container');
+            const newItem = document.createElement('div');
+            newItem.className = 'pulverizacao-item mb-4 border-bottom pb-3';
+            newItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="text-success">${pulverizacaoCount}ª Pulverização após emergência</h6>
+                    <button type="button" class="btn btn-sm btn-danger btn-remove-pulverizacao">
+                        <i class="bi bi-trash"></i> Remover
+                    </button>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">DATA</label>
+                        <input type="date" name="data_pos_${pulverizacaoCount}" class="form-control">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">CLASSE DO PRODUTO</label>
+                        <select name="classe_pos_${pulverizacaoCount}" class="form-select classe-produto">
+                            <option value="">Selecione...</option>
+                            <option value="Inseticida">Inseticida</option>
+                            <option value="Fungicida">Fungicida</option>
+                            <option value="Acaricida">Acaricida</option>
+                            <option value="Herbicida">Herbicida</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ALVO (múltipla escolha)</label>
+                        <select name="alvo_pos_${pulverizacaoCount}" class="form-select alvo-select" multiple size="3">
+                            <option value="">Selecione a classe primeiro</option>
+                        </select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newItem);
+            
+            // Adicionar event listener para o novo select
+            newItem.querySelector('.classe-produto').addEventListener('change', function() {
+                atualizarAlvo(this);
+            });
+            
+            // Adicionar event listener para o botão remover
+            newItem.querySelector('.btn-remove-pulverizacao').addEventListener('click', function() {
+                newItem.remove();
+                // Renumerar as pulverizações restantes
+                renumerarPulverizacoes();
+            });
+            
+            // Atualizar o contador
+            document.getElementById('pulverizacoes-count').value = pulverizacaoCount;
+        });
+    }
+    
+    // Função para renumerar pulverizações após remoção
+    function renumerarPulverizacoes() {
+        const items = document.querySelectorAll('.pulverizacao-item');
+        items.forEach((item, index) => {
+            const newNumber = index + 1;
+            item.querySelector('h6').textContent = newNumber + 'ª Pulverização após emergência';
+            
+            // Atualizar os nomes dos campos
+            const dataInput = item.querySelector('input[type="date"]');
+            if (dataInput) dataInput.name = `data_pos_${newNumber}`;
+            
+            const classeSelect = item.querySelector('.classe-produto');
+            if (classeSelect) classeSelect.name = `classe_pos_${newNumber}`;
+            
+            const alvoSelect = item.querySelector('.alvo-select');
+            if (alvoSelect) alvoSelect.name = `alvo_pos_${newNumber}`;
+        });
+        
+        pulverizacaoCount = items.length;
+        const countInput = document.getElementById('pulverizacoes-count');
+        if (countInput) countInput.value = pulverizacaoCount;
     }
 </script>
 {% endblock %}
