@@ -256,10 +256,6 @@ def export_excel():
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-@app.route('/record/<int:id>')
-def view_record(id):
-    registro = FormularioSoja.query.get_or_404(id)
-    return render_template('view_record.html', registro=registro, insetos=INSETOS_ALVO, doencas=DOENCAS_ALVO)
 
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_record(id):
