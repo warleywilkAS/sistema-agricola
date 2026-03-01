@@ -286,7 +286,7 @@ def edit_record(id):
             # Remover pulverizações antigas
             Pulverizacao.query.filter_by(formulario_id=registro.id).delete()
 
-              # Pré-plantio com múltiplas classes
+            # Pré-plantio com múltiplas classes
               if request.form.get('data_pre_plantio'):  # <--- PRECISA DE 12 ESPAÇOS NO INÍCIO!
                   classes_pre = request.form.getlist('classe_pre_plantio')
                   if classes_pre:
