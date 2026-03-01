@@ -488,35 +488,43 @@
         }
     }
     
-    // Função específica para pré-plantio
-    function atualizarAlvoPre(selectClasse) {
-        const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
-        const classe = selectClasse.value;
-        
-        alvoSelect.innerHTML = '';
-        alvoSelect.size = 5;
-        
+    // Função específica para pré-plantio com múltiplas classes
+function atualizarAlvoPre(selectClasse) {
+    const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
+    
+    // Pegar TODAS as classes selecionadas
+    const classesSelecionadas = Array.from(selectClasse.selectedOptions).map(opt => opt.value);
+    
+    alvoSelect.innerHTML = '';
+    alvoSelect.size = 8;
+    
+    let alvosCombinados = [];
+    
+    // Combinar alvos de todas as classes selecionadas
+    classesSelecionadas.forEach(classe => {
         if (classe === 'Inseticida') {
-            insetos.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+            alvosCombinados = [...alvosCombinados, ...insetos];
         } else if (classe === 'Fungicida') {
-            doencas.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+            alvosCombinados = [...alvosCombinados, ...doencas];
         } else if (classe === 'Acaricida') {
-            acaros.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+            alvosCombinados = [...alvosCombinados, ...acaros];
         } else if (classe === 'Herbicida') {
-            plantas.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        } else {
-            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
-            alvoSelect.size = 1;
+            alvosCombinados = [...alvosCombinados, ...plantas];
         }
+    });
+    
+    // Remover duplicatas
+    alvosCombinados = [...new Set(alvosCombinados)];
+    
+    if (alvosCombinados.length > 0) {
+        alvosCombinados.forEach(item => {
+            alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+        });
+    } else {
+        alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+        alvoSelect.size = 1;
     }
+}
     
     // Adicionar event listeners para selects de classe pós-emergência
     document.querySelectorAll('.classe-produto').forEach(select => {
@@ -525,13 +533,13 @@
         });
     });
     
-    // Event listener para pré-plantio
-    const selectPre = document.querySelector('.classe-produto-pre');
-    if (selectPre) {
-        selectPre.addEventListener('change', function() {
-            atualizarAlvoPre(this);
-        });
-    }
+   // Event listener para pré-plantio (com múltiplas seleções)
+const selectPre = document.querySelector('.classe-produto-pre');
+if (selectPre) {
+    selectPre.addEventListener('change', function() {
+        atualizarAlvoPre(this);
+    });
+}
     
     // ============================================
     // CÓDIGO DO BOTÃO DINÂMICO
