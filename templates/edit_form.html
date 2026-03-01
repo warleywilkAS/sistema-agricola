@@ -202,42 +202,44 @@
                 <input type="date" name="data_pre_plantio" class="form-control" value="{{ pre_plantio.data if pre_plantio else '' }}">
             </div>
             <div class="col-md-3 mb-3">
-                <label class="form-label">CLASSE DO PRODUTO</label>
-                <select name="classe_pre_plantio" class="form-select classe-produto-pre">
-                    <option value="">Selecione...</option>
-                    <option value="Inseticida" {% if pre_plantio and pre_plantio.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
-                    <option value="Fungicida" {% if pre_plantio and pre_plantio.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
-                    <option value="Acaricida" {% if pre_plantio and pre_plantio.classe_produto == 'Acaricida' %}selected{% endif %}>Acaricida</option>
-                    <option value="Herbicida" {% if pre_plantio and pre_plantio.classe_produto == 'Herbicida' %}selected{% endif %}>Herbicida</option>
-                </select>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">ALVO (múltipla escolha)</label>
-                <select name="alvo_pre_plantio" class="form-select alvo-select-pre" multiple size="3">
-                    {% if pre_plantio and pre_plantio.classe_produto == 'Inseticida' %}
-                        {% for inseto in insetos %}
-                        <option value="{{ inseto }}" {% if pre_plantio.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
-                        {% endfor %}
-                    {% elif pre_plantio and pre_plantio.classe_produto == 'Fungicida' %}
-                        {% for doenca in doencas %}
-                        <option value="{{ doenca }}" {% if pre_plantio.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
-                        {% endfor %}
-                    {% elif pre_plantio and pre_plantio.classe_produto == 'Acaricida' %}
-                        {% for acaro in acaros %}
-                        <option value="{{ acaro }}" {% if pre_plantio.alvo == acaro %}selected{% endif %}>{{ acaro }}</option>
-                        {% endfor %}
-                    {% elif pre_plantio and pre_plantio.classe_produto == 'Herbicida' %}
-                        {% for planta in plantas %}
-                        <option value="{{ planta }}" {% if pre_plantio.alvo == planta %}selected{% endif %}>{{ planta }}</option>
-                        {% endfor %}
-                    {% else %}
-                        <option value="">Selecione a classe primeiro</option>
-                    {% endif %}
-                </select>
-                <small class="text-muted">Segure Ctrl para selecionar múltiplos</small>
-            </div>
-        </div>
-    </div>
+    <label class="form-label">CLASSE DO PRODUTO</label>
+    <select name="classe_pre_plantio" class="form-select classe-produto-pre" multiple size="4">
+        <option value="Inseticida" {% if pre_plantio and 'Inseticida' in pre_plantio.classe_produto %}selected{% endif %}>Inseticida</option>
+        <option value="Fungicida" {% if pre_plantio and 'Fungicida' in pre_plantio.classe_produto %}selected{% endif %}>Fungicida</option>
+        <option value="Acaricida" {% if pre_plantio and 'Acaricida' in pre_plantio.classe_produto %}selected{% endif %}>Acaricida</option>
+        <option value="Herbicida" {% if pre_plantio and 'Herbicida' in pre_plantio.classe_produto %}selected{% endif %}>Herbicida</option>
+    </select>
+    <small class="text-muted">Segure Ctrl para selecionar múltiplas classes</small>
+</div>
+<div class="col-md-6 mb-3">
+    <label class="form-label">ALVO (múltipla escolha)</label>
+    <select name="alvo_pre_plantio" class="form-select alvo-select-pre" multiple size="3">
+        {% if pre_plantio and pre_plantio.classe_produto %}
+            {% if 'Inseticida' in pre_plantio.classe_produto %}
+                {% for inseto in insetos %}
+                <option value="{{ inseto }}" {% if pre_plantio.alvo == inseto %}selected{% endif %}>{{ inseto }}</option>
+                {% endfor %}
+            {% endif %}
+            {% if 'Fungicida' in pre_plantio.classe_produto %}
+                {% for doenca in doencas %}
+                <option value="{{ doenca }}" {% if pre_plantio.alvo == doenca %}selected{% endif %}>{{ doenca }}</option>
+                {% endfor %}
+            {% endif %}
+            {% if 'Acaricida' in pre_plantio.classe_produto %}
+                {% for acaro in acaros %}
+                <option value="{{ acaro }}" {% if pre_plantio.alvo == acaro %}selected{% endif %}>{{ acaro }}</option>
+                {% endfor %}
+            {% endif %}
+            {% if 'Herbicida' in pre_plantio.classe_produto %}
+                {% for planta in plantas %}
+                <option value="{{ planta }}" {% if pre_plantio.alvo == planta %}selected{% endif %}>{{ planta }}</option>
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            <option value="">Selecione a classe primeiro</option>
+        {% endif %}
+    </select>
+    <small class="text-muted">Segure Ctrl para selecionar múltiplos alvos</small>
 </div>
             <!-- 4. Pulverizações após emergência com botão dinâmico -->
 <div class="card mb-4">
