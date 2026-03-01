@@ -257,7 +257,7 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">CLASSE DO PRODUTO</label>
-                        <select name="classe_pos_1" class="form-select classe-produto">
+                        <select name="classe_pos_1" class="form-select classe-produto" multiple size="4">
                             <option value="">Selecione...</option>
                             <option value="Inseticida" {% if pos1 and pos1.classe_produto == 'Inseticida' %}selected{% endif %}>Inseticida</option>
                             <option value="Fungicida" {% if pos1 and pos1.classe_produto == 'Fungicida' %}selected{% endif %}>Fungicida</option>
