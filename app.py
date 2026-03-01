@@ -285,15 +285,20 @@ def edit_record(id):
             for i in range(1, 8):
                 data = request.form.get(f'data_pos_{i}')
                 if data:
-                    classe = request.form.get(f'classe_pos_{i}')
+                    classes = request.form.getlist(f'classe_pos_{i}')
+if classes:
+    classe_str = ', '.join(classes)  # Converte lista para string "Inseticida, Fungicida"
+else:
+    classe_str = ''
                     alvo = request.form.get(f'alvo_pos_{i}')
-                    if classe and alvo:
-                        pulv = Pulverizacao(
-                            formulario_id=registro.id,
-                            tipo=f'pos_{i}',
-                            data=data,
-                            classe_produto=classe,
-                            alvo=alvo
+                    if data and classe_str:
+    pulv = Pulverizacao(
+        formulario_id=formulario.id,
+        tipo=f'pos_{i}',
+        data=data,
+        classe_produto=classe_str,
+        alvo=alvo
+    )
                         )
                         db.session.add(pulv)
             
