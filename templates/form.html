@@ -347,31 +347,84 @@
     // Dados dos alvos
     const insetos = {{ insetos|tojson }};
     const doencas = {{ doencas|tojson }};
+    const plantas = {{ plantas|tojson }};
+    const acaros = {{ acaros|tojson }};
     
-    // Função para atualizar opções de alvo baseado na classe selecionada
+    // Função para atualizar opções de alvo para pulverizações pós-emergência
     function atualizarAlvo(selectClasse) {
         const row = selectClasse.closest('.row');
         const alvoSelect = row.querySelector('.alvo-select');
         const classe = selectClasse.value;
         
-        alvoSelect.innerHTML = '<option value="">Selecione...</option>';
+        alvoSelect.innerHTML = '';
+        alvoSelect.size = 5; // Mostrar mais opções
         
-        if (classe === 'Inseticida' || classe === 'Acaricida') {
-            insetos.forEach(inseto => {
-                alvoSelect.innerHTML += `<option value="${inseto}">${inseto}</option>`;
+        if (classe === 'Inseticida') {
+            insetos.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
             });
         } else if (classe === 'Fungicida') {
-            doencas.forEach(doenca => {
-                alvoSelect.innerHTML += `<option value="${doenca}">${doenca}</option>`;
+            doencas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
             });
+        } else if (classe === 'Acaricida') {
+            acaros.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Herbicida') {
+            plantas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else {
+            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+            alvoSelect.size = 1;
         }
     }
     
-    // Adicionar event listeners para todos os selects de classe
+    // Função específica para pré-plantio
+    function atualizarAlvoPre(selectClasse) {
+        const row = selectClasse.closest('.row');
+        const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
+        const classe = selectClasse.value;
+        
+        alvoSelect.innerHTML = '';
+        alvoSelect.size = 5;
+        
+        if (classe === 'Inseticida') {
+            insetos.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Fungicida') {
+            doencas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Acaricida') {
+            acaros.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else if (classe === 'Herbicida') {
+            plantas.forEach(item => {
+                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        } else {
+            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+            alvoSelect.size = 1;
+        }
+    }
+    
+    // Adicionar event listeners para selects de classe pós-emergência
     document.querySelectorAll('.classe-produto').forEach(select => {
         select.addEventListener('change', function() {
             atualizarAlvo(this);
         });
     });
+    
+    // Event listener para pré-plantio
+    const selectPre = document.querySelector('.classe-produto-pre');
+    if (selectPre) {
+        selectPre.addEventListener('change', function() {
+            atualizarAlvoPre(this);
+        });
+    }
 </script>
 {% endblock %}
