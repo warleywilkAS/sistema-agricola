@@ -236,13 +236,13 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">CLASSE DO PRODUTO</label>
-                        <select name="classe_pos_1" class="form-select classe-produto">
-                            <option value="">Selecione...</option>
-                            <option value="Inseticida">Inseticida</option>
-                            <option value="Fungicida">Fungicida</option>
-                            <option value="Acaricida">Acaricida</option>
-                            <option value="Herbicida">Herbicida</option>
-                        </select>
+                        <select name="classe_pos_1" class="form-select classe-produto" multiple size="4">
+    <option value="Inseticida">Inseticida</option>
+    <option value="Fungicida">Fungicida</option>
+    <option value="Acaricida">Acaricida</option>
+    <option value="Herbicida">Herbicida</option>
+</select>
+<small class="text-muted">Segure Ctrl para selecionar múltiplas classes</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">ALVO (múltipla escolha)</label>
@@ -363,66 +363,82 @@
     const plantas = {{ plantas|tojson }};
     const acaros = {{ acaros|tojson }};
     
-    // Função para atualizar opções de alvo para pulverizações pós-emergência
-    function atualizarAlvo(selectClasse) {
-        const row = selectClasse.closest('.row');
-        const alvoSelect = row.querySelector('.alvo-select');
-        const classe = selectClasse.value;
-        
-        alvoSelect.innerHTML = '';
-        alvoSelect.size = 5; // Mostrar mais opções
-        
-        if (classe === 'Inseticida') {
-            insetos.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        } else if (classe === 'Fungicida') {
-            doencas.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        } else if (classe === 'Acaricida') {
-            acaros.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        } else if (classe === 'Herbicida') {
-            plantas.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        } else {
-            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
-            alvoSelect.size = 1;
-        }
-    }
+    // Função para atualizar opções de alvo baseado nas classes selecionadas (pós-emergência)
+function atualizarAlvo(selectClasse) {
+    const row = selectClasse.closest('.row');
+    const alvoSelect = row.querySelector('.alvo-select');
     
-    // Função específica para pré-plantio
-    function atualizarAlvoPre(selectClasse) {
-        const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
-        const classe = selectClasse.value;
-        
-        alvoSelect.innerHTML = '';
-        alvoSelect.size = 5;
-        
+    // Pegar TODAS as classes selecionadas
+    const classesSelecionadas = Array.from(selectClasse.selectedOptions).map(opt => opt.value);
+    
+    alvoSelect.innerHTML = '';
+    alvoSelect.size = 8; // Aumentar para mostrar mais opções
+    
+    let alvosCombinados = [];
+    
+    // Combinar alvos de todas as classes selecionadas
+    classesSelecionadas.forEach(classe => {
         if (classe === 'Inseticida') {
-            insetos.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+            alvosCombinados = [...alvosCombinados, ...insetos];
         } else if (classe === 'Fungicida') {
-            doencas.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+            alvosCombinados = [...alvosCombinados, ...doencas];
         } else if (classe === 'Acaricida') {
-            acaros.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+            alvosCombinados = [...alvosCombinados, ...acaros];
         } else if (classe === 'Herbicida') {
-            plantas.forEach(item => {
-                alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        } else {
-            alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
-            alvoSelect.size = 1;
+            alvosCombinados = [...alvosCombinados, ...plantas];
         }
+    });
+    
+    // Remover duplicatas (caso a mesma opção apareça em múltiplas classes)
+    alvosCombinados = [...new Set(alvosCombinados)];
+    
+    if (alvosCombinados.length > 0) {
+        alvosCombinados.forEach(item => {
+            alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+        });
+    } else {
+        alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+        alvoSelect.size = 1;
     }
+}
+    
+    // Função específica para pré-plantio com múltiplas classes
+function atualizarAlvoPre(selectClasse) {
+    const alvoSelect = document.querySelector('select[name="alvo_pre_plantio"]');
+    
+    // Pegar TODAS as classes selecionadas
+    const classesSelecionadas = Array.from(selectClasse.selectedOptions).map(opt => opt.value);
+    
+    alvoSelect.innerHTML = '';
+    alvoSelect.size = 8;
+    
+    let alvosCombinados = [];
+    
+    // Combinar alvos de todas as classes selecionadas
+    classesSelecionadas.forEach(classe => {
+        if (classe === 'Inseticida') {
+            alvosCombinados = [...alvosCombinados, ...insetos];
+        } else if (classe === 'Fungicida') {
+            alvosCombinados = [...alvosCombinados, ...doencas];
+        } else if (classe === 'Acaricida') {
+            alvosCombinados = [...alvosCombinados, ...acaros];
+        } else if (classe === 'Herbicida') {
+            alvosCombinados = [...alvosCombinados, ...plantas];
+        }
+    });
+    
+    // Remover duplicatas
+    alvosCombinados = [...new Set(alvosCombinados)];
+    
+    if (alvosCombinados.length > 0) {
+        alvosCombinados.forEach(item => {
+            alvoSelect.innerHTML += `<option value="${item}">${item}</option>`;
+        });
+    } else {
+        alvoSelect.innerHTML = '<option value="">Selecione uma classe primeiro</option>';
+        alvoSelect.size = 1;
+    }
+}
     
     // Adicionar event listeners para selects de classe pós-emergência
     document.querySelectorAll('.classe-produto').forEach(select => {
@@ -469,13 +485,13 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">CLASSE DO PRODUTO</label>
-                        <select name="classe_pos_${pulverizacaoCount}" class="form-select classe-produto">
-                            <option value="">Selecione...</option>
-                            <option value="Inseticida">Inseticida</option>
-                            <option value="Fungicida">Fungicida</option>
-                            <option value="Acaricida">Acaricida</option>
-                            <option value="Herbicida">Herbicida</option>
-                        </select>
+                        <select name="classe_pos_${pulverizacaoCount}" class="form-select classe-produto" multiple size="4">
+    <option value="Inseticida">Inseticida</option>
+    <option value="Fungicida">Fungicida</option>
+    <option value="Acaricida">Acaricida</option>
+    <option value="Herbicida">Herbicida</option>
+</select>
+<small class="text-muted">Segure Ctrl para selecionar múltiplas classes</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">ALVO (múltipla escolha)</label>
