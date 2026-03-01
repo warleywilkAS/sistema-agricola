@@ -4,6 +4,7 @@ from flask import send_file
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from models import db, FormularioSoja, Pulverizacao
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -194,24 +195,49 @@ def export_excel():
     # Preparar dados para o Excel
     dados = []
     for r in registros:
-        # Contar pulverizações
-        pulverizacoes_count = len(r.pulverizacoes)
-        alvos = ', '.join([f"{p.classe_produto}: {p.alvo}" for p in r.pulverizacoes[:3]])
+        # Buscar todas as pulverizações
+        pulverizacoes_list = []
+        for p in r.pulverizacoes:
+            pulverizacoes_list.append(f"{p.tipo}: {p.data} - {p.classe_produto} - {p.alvo}")
+        
+        pulverizacoes_str = ' | '.join(pulverizacoes_list)
         
         dados.append({
             'ID': r.id,
             'Data Criação': r.data_criacao.strftime('%d/%m/%Y %H:%M'),
-            'Produtor': r.numero_produtor,
+            'Número Produtor': r.numero_produtor,
+            'Região': r.regiao,
             'Município': r.municipio,
+            'Meso_IDR': r.meso_idr,
             'Área (ha)': r.area_soja,
-            'Produtividade': r.produtividade_media,
+            'Produtividade (sc/ha)': r.produtividade_media,
             'Cultivar': r.cultivar,
             'BT': r.bt,
             'Data Plantio': r.data_plantio,
-            'Adversidade': r.qual_adversidade,
-            'N° Pulverizações': pulverizacoes_count,
-            'Principais Alvos': alvos,
-            'Coletor': r.nome_coletor
+            'Data Emergência': r.data_emergencia,
+            'Houve Adversidade': r.houve_adversidade,
+            'Qual Adversidade': r.qual_adversidade,
+            'Nome Coletor': r.nome_coletor,
+            'Unidade Municipal': r.unidade_municipal,
+            'Conhecimento MID': r.conhecimento_mid,
+            'Utiliza MID': r.utiliza_mid,
+            'Conhecimento MIP': r.conhecimento_mip,
+            'Utiliza MIP': r.utiliza_mip,
+            'Herbicida Dessecação Alvo': r.herbicida_dessecacao_alvo,
+            'Herbicida Dessecação Aplicações': r.herbicida_dessecacao_aplicacoes,
+            'Herbicida Pré Alvo': r.herbicida_pre_alvo,
+            'Herbicida Pré Aplicações': r.herbicida_pre_aplicacoes,
+            'Herbicida Pós Alvo': r.herbicida_pos_alvo,
+            'Herbicida Pós Aplicações': r.herbicida_pos_aplicacoes,
+            'Tratamento Sementes': r.tratamento_sementes,
+            'Sal na Mistura': r.sal_mistura,
+            'Controle Biológico': r.controle_biologico,
+            'Inoculação Sementes': r.inoculacao_sementes,
+            'Forma Inoculação': r.forma_inoculacao,
+            'Coinoculação': r.coinoculacao,
+            'Co e Mo': r.co_mo,
+            'Co e Mo Aplicação': r.co_mo_aplicacao,
+            'Pulverizações': pulverizacoes_str
         })
     
     # Criar DataFrame
@@ -226,11 +252,10 @@ def export_excel():
     
     return send_file(
         output,
-        download_name='registros_soja.xlsx',
+        download_name=f'registros_soja_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx',
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
 @app.route('/record/<int:id>')
 def view_record(id):
     registro = FormularioSoja.query.get_or_404(id)
