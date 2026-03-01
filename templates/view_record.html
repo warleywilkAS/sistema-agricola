@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-file-text"></i> Detalhes do Registro #{{ registro.id }}
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5 class="text-success">Identificação</h5>
+                <table class="table table-sm">
+                    <tr><th>Número Produtor:</th><td>{{ registro.numero_produtor or '-' }}</td></tr>
+                    <tr><th>Região:</th><td>{{ registro.regiao or '-' }}</td></tr>
+                    <tr><th>Município:</th><td>{{ registro.municipio or '-' }}</td></tr>
+                    <tr><th>MESO_IDR:</th><td>{{ registro.meso_idr or '-' }}</td></tr>
+                    <tr><th>Área com Soja (ha):</th><td>{{ registro.area_soja }}</td></tr>
+                    <tr><th>Produtividade Média:</th><td>{{ registro.produtividade_media }} sc/ha</td></tr>
+                    <tr><th>Cultivar:</th><td>{{ registro.cultivar or '-' }}</td></tr>
+                    <tr><th>BT:</th><td>{{ registro.bt or '-' }}</td></tr>
+                    <tr><th>Data Plantio:</th><td>{{ registro.data_plantio or '-' }}</td></tr>
+                    <tr><th>Data Emergência:</th><td>{{ registro.data_emergencia or '-' }}</td></tr>
+                    <tr><th>Adversidade:</th><td>{{ registro.houve_adversidade or '-' }}</td></tr>
+                    <tr><th>Qual Adversidade:</th><td>{{ registro.qual_adversidade or '-' }}</td></tr>
+                    <tr><th>Coletor:</th><td>{{ registro.nome_coletor or '-' }}</td></tr>
+                    <tr><th>Unidade Municipal:</th><td>{{ registro.unidade_municipal or '-' }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-success">MIP e MID</h5>
+                <table class="table table-sm">
+                    <tr><th>Conhecimento MID:</th><td>{{ registro.conhecimento_mid or '-' }}</td></tr>
+                    <tr><th>Utiliza MID:</th><td>{{ registro.utiliza_mid or '-' }}</td></tr>
+                    <tr><th>Conhecimento MIP:</th><td>{{ registro.conhecimento_mip or '-' }}</td></tr>
+                    <tr><th>Utiliza MIP:</th><td>{{ registro.utiliza_mip or '-' }}</td></tr>
+                </table>
+                
+                <h5 class="text-success mt-4">Controle Plantas Invasoras</h5>
+                <table class="table table-sm">
+                    <tr><th>Herbicida Dessecação:</th><td>{{ registro.herbicida_dessecacao_alvo or '-' }} ({{ registro.herbicida_dessecacao_aplicacoes }} aplic.)</td></tr>
+                    <tr><th>Herbicida Pré-emergente:</th><td>{{ registro.herbicida_pre_alvo or '-' }} ({{ registro.herbicida_pre_aplicacoes }} aplic.)</td></tr>
+                    <tr><th>Herbicida Pós-emergente:</th><td>{{ registro.herbicida_pos_alvo or '-' }} ({{ registro.herbicida_pos_aplicacoes }} aplic.)</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <h5 class="text-success">Pulverizações</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Classe</th>
+                        <th>Alvo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pulv in registro.pulverizacoes %}
+                    <tr>
+                        <td>
+                            {% if pulv.tipo == 'pre_plantio' %}
+                                Pré-plantio
+                            {% else %}
+                                {{ pulv.tipo.split('_')[1] }}ª Pós-emergência
+                            {% endif %}
+                        </td>
+                        <td>{{ pulv.data or '-' }}</td>
+                        <td>{{ pulv.classe_produto or '-' }}</td>
+                        <td>{{ pulv.alvo or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h5 class="text-success">Outras Informações</h5>
+                <table class="table table-sm">
+                    <tr><th>Tratamento Sementes:</th><td>{{ registro.tratamento_sementes or '-' }}</td></tr>
+                    <tr><th>Sal na Mistura:</th><td>{{ registro.sal_mistura or '-' }}</td></tr>
+                    <tr><th>Controle Biológico:</th><td>{{ registro.controle_biologico or '-' }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-success">FBN</h5>
+                <table class="table table-sm">
+                    <tr><th>Inoculação:</th><td>{{ registro.inoculacao_sementes or '-' }}</td></tr>
+                    <tr><th>Forma Inoculação:</th><td>{{ registro.forma_inoculacao or '-' }}</td></tr>
+                    <tr><th>Coinoculação:</th><td>{{ registro.coinoculacao or '-' }}</td></tr>
+                    <tr><th>Co e Mo:</th><td>{{ registro.co_mo or '-' }}</td></tr>
+                    <tr><th>Aplicação Co e Mo:</th><td>{{ registro.co_mo_aplicacao or '-' }}</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('edit_record', id=registro.id) }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a href="{{ url_for('view_records') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
