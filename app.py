@@ -1,3 +1,6 @@
+import pandas as pd
+from io import BytesIO
+from flask import send_file
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from models import db, FormularioSoja, Pulverizacao
 import json
