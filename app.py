@@ -286,19 +286,21 @@ def edit_record(id):
                 data = request.form.get(f'data_pos_{i}')
                 if data:
                     classes = request.form.getlist(f'classe_pos_{i}')
-if classes:
-    classe_str = ', '.join(classes)  # Converte lista para string "Inseticida, Fungicida"
-else:
-    classe_str = ''
+                    if classes:
+                        classe_str = ', '.join(classes)
+                    else:
+                        classe_str = ''
+                    
                     alvo = request.form.get(f'alvo_pos_{i}')
+                    
                     if data and classe_str:
-    pulv = Pulverizacao(
-        formulario_id=formulario.id,
-        tipo=f'pos_{i}',
-        data=data,
-        classe_produto=classe_str,
-        alvo=alvo
-    )
+                        pulv = Pulverizacao(
+                            formulario_id=registro.id,
+                            tipo=f'pos_{i}',
+                            data=data,
+                            classe_produto=classe_str,
+                            alvo=alvo
+                        )
                         db.session.add(pulv)
             
             db.session.commit()
