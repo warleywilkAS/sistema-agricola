@@ -40,6 +40,25 @@ DOENCAS_ALVO = [
     "Outras Doenças Fungicas"
 ]
 
+PLANTAS_DANINHAS = [
+    "Buva (Conyza spp.)",
+    "Capim-amargoso (Digitaria insularis)",
+    "Caruru (Amaranthus spp.)",
+    "Capim-pé-de-galinha (Eleusine indica)",
+    "Leiteiro (Euphorbia heterophylla)",
+    "Picão-preto (Bidens pilosa)",
+    "Trapoeraba (Commelina spp.)",
+    "Outras Plantas Daninhas"
+]
+
+ACAROS = [
+    "Ácaro-rajado (Tetranychus urticae)",
+    "Ácaro-verde (Mononychellus planki)",
+    "Ácaro-branco (Polyphagotarsonemus latus)",
+    "Ácaros-vermelhos (Tetranychus spp.)",
+    "Outros ácaros"
+]
+
 @app.route('/')
 def index():
     return render_template('index.html')
