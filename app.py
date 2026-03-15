@@ -289,24 +289,24 @@ def export_excel():
         celula.alignment = Alignment(horizontal='center', vertical='center')
     
     # LINHA 5: Subtítulos (corrigido!)
-subtitulos = [
-    "Tabela", "N° P", "Ordem", "", "Meso_IDR",
-    "Região", "Município", "Área com Soja (ha)", "Cultivar",
-    "Bt", "Produtividade Média (sc/ha)", "Data Plantio",
-    "Adversidade", "Sinistro", "Conhec. MID", "Utiliza MID",
-    "Conhec. MIP", "Utiliza MIP", "Classe do Produto",
-    "Alvo", "N° Aplicações", "Classe do Produto", "Alvo",
-    "N° Aplicações", "Classe do Produto", "Alvo",
-    "N° Aplicações", "Classe do Produto", "Alvo",
-    "N° Aplicações", "Pulverização na Dessecação", "Data",
-    "Classe do Produto", "Alvo_1", "Alvo_2", "Alvo_3",
-    # ... continue com todos os subtítulos
-]
+    subtitulos = [
+        "Tabela", "N° P", "Ordem", "", "Meso_IDR",
+        "Região", "Município", "Área com Soja (ha)", "Cultivar",
+        "Bt", "Produtividade Média (sc/ha)", "Data Plantio",
+        "Adversidade", "Sinistro", "Conhec. MID", "Utiliza MID",
+        "Conhec. MIP", "Utiliza MIP", "Classe do Produto",
+        "Alvo", "N° Aplicações", "Classe do Produto", "Alvo",
+        "N° Aplicações", "Classe do Produto", "Alvo",
+        "N° Aplicações", "Classe do Produto", "Alvo",
+        "N° Aplicações", "Pulverização na Dessecação", "Data",
+        "Classe do Produto", "Alvo_1", "Alvo_2", "Alvo_3",
+        # ... continue com todos os subtítulos
+    ]
 
-for col, titulo in enumerate(subtitulos, 1):
-    if titulo:  # só preenche se não for string vazia
-        celula = ws_total.cell(row=5, column=col, value=titulo)
-        celula.fill = sub_fill
+    for col, titulo in enumerate(subtitulos, 1):
+        if titulo:  # só preenche se não for string vazia
+            celula = ws_total.cell(row=5, column=col, value=titulo)
+            celula.fill = sub_fill
     
     # ============================================================
     # POPULAR DADOS
