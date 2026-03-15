@@ -288,23 +288,25 @@ def export_excel():
         celula.font = titulo_font
         celula.alignment = Alignment(horizontal='center', vertical='center')
     
-    # LINHA 5: Subtítulos
-    subtitulos = [
-        (1, "Tabela"), (2, "N° P"), (3, "Ordem"), (4, ""), (5, "Meso_IDR"),
-        (6, "Região"), (7, "Município"), (8, "Área com Soja (ha)"), (9, "Cultivar"),
-        (10, "Bt"), (11, "Produtividade Média (sc/ha)"), (12, "Data Plantio"),
-        (13, "Adversidade"), (14, "Sinistro"), (15, "Conhec. MID"), (16, "Utiliza MID"),
-        (17, "Conhec. MIP"), (18, "Utiliza MIP"), (19, "Classe do Produto"),
-        (20, "Alvo"), (21, "N° Aplicações"), (22, "Classe do Produto"), (23, "Alvo"),
-        (24, "N° Aplicações"), (25, "Classe do Produto"), (26, "Alvo"),
-        (27, "N° Aplicações"), (28, "Classe do Produto"), (29, "Alvo"),
-        (30, "N° Aplicações"), (31, "Pulverização na Dessecação"), (32, "Data"),
-        (33, "Classe do Produto"), (34, "Alvo_1"), (35, "Alvo_2"), (36, "Alvo_3"),
-        # ... continuar com todos os subtítulos até o final
-    ]
-    
-    for col, titulo in enumerate(subtitulos, 1):
-        ws_total.cell(row=5, column=col, value=titulo).fill = sub_fill
+    # LINHA 5: Subtítulos (corrigido!)
+subtitulos = [
+    "Tabela", "N° P", "Ordem", "", "Meso_IDR",
+    "Região", "Município", "Área com Soja (ha)", "Cultivar",
+    "Bt", "Produtividade Média (sc/ha)", "Data Plantio",
+    "Adversidade", "Sinistro", "Conhec. MID", "Utiliza MID",
+    "Conhec. MIP", "Utiliza MIP", "Classe do Produto",
+    "Alvo", "N° Aplicações", "Classe do Produto", "Alvo",
+    "N° Aplicações", "Classe do Produto", "Alvo",
+    "N° Aplicações", "Classe do Produto", "Alvo",
+    "N° Aplicações", "Pulverização na Dessecação", "Data",
+    "Classe do Produto", "Alvo_1", "Alvo_2", "Alvo_3",
+    # ... continue com todos os subtítulos
+]
+
+for col, titulo in enumerate(subtitulos, 1):
+    if titulo:  # só preenche se não for string vazia
+        celula = ws_total.cell(row=5, column=col, value=titulo)
+        celula.fill = sub_fill
     
     # ============================================================
     # POPULAR DADOS
