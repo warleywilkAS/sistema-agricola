@@ -7,6 +7,8 @@ import json
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment
+import os
+from export_excel import gerar_excel, orm_para_dict
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -194,213 +196,18 @@ def view_records():
     registros = FormularioSoja.query.order_by(FormularioSoja.data_criacao.desc()).all()
     return render_template('view_records.html', registros=registros)
 
-@app.route('/export/excel')
-def export_excel():
-    from openpyxl import Workbook
-    from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
-    from openpyxl.utils import get_column_letter
-    from io import BytesIO
-    from datetime import datetime
+@app.route("/exportar_excel")
+def exportar_excel():
+    todos = FormularioSoja.query.order_by(FormularioSoja.id).all()
+    registros = [orm_para_dict(r) for r in todos]
+    filepath = os.path.join("/tmp", "MesoIDR_Export.xlsx")
+    gerar_excel(registros, filepath)
+    return send_file(filepath,
+                     as_attachment=True,
+                     download_name="MesoIDR_Exportacao.xlsx",
+                     mimetype="application/vnd.openxmlformats-officedocument"
+                              ".spreadsheetml.sheet")
     
-    # Buscar todos os registros
-    registros = FormularioSoja.query.order_by(FormularioSoja.data_criacao.desc()).all()
-    
-    # Criar workbook
-    wb = Workbook()
-    
-    # ============================================================
-    # ABA 1: BD (Base de Dados - Dicionário)
-    # ============================================================
-    ws_bd = wb.active
-    ws_bd.title = "BD"
-    
-    # Cabeçalhos da aba BD (baseado na planilha modelo)
-    cabecalhos_bd = [
-        "Doenças", "Bactérias", "Pragas", "Ácaros", "", "", "Estádio", "Outros", 
-        "Aplicações", "Evento", "", "Cultivares", "", "", "", "", "MACROS", "",
-        "Regionais", "Apucarana", "Campo_Mourão", "Cascavel", "Cianorte", 
-        "Cornélio_Procópio", "Curitiba", "Dois_Vizinhos", "Francisco_Beltrão",
-        "Guarapuava", "Irati", "Ivaiporã", "Laranjeiras_do_Sul", "Londrina",
-        "Maringá", "Paranaguá", "Paranavaí", "Pato_Branco", "Ponta_Grossa",
-        "Sto_Antônio_da_Platina", "Toledo", "Umuarama", "União_da_Vitória", "",
-        "NOROESTE", "NORTE", "OESTE", "SUDOESTE", "SUL", "Plantas Invasoras"
-    ]
-    
-    for col, titulo in enumerate(cabecalhos_bd, 1):
-        ws_bd.cell(row=1, column=col, value=titulo)
-    
-    # Preencher com dados das listas
-    # Doenças (col A)
-    for i, doenca in enumerate(DOENCAS_ALVO, 2):
-        ws_bd.cell(row=i, column=1, value=doenca)
-    
-    # Pragas (col C)
-    for i, praga in enumerate(INSETOS_ALVO, 2):
-        ws_bd.cell(row=i, column=3, value=praga)
-    
-    # Ácaros (col D)
-    for i, acaro in enumerate(ACAROS, 2):
-        ws_bd.cell(row=i, column=4, value=acaro)
-    
-    # Plantas invasoras (col BH)
-    for i, planta in enumerate(PLANTAS_DANINHAS, 2):
-        ws_bd.cell(row=i, column=60, value=planta)
-    
-    # Estádios fenológicos (col G)
-    estadios = ["VE", "VC", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "VN",
-                "R1", "R2", "R3", "R4", "R5.1", "R5.2", "R5.3", "R5.4", "R5.5",
-                "R6", "R7.1", "R7.2", "R7.3", "R7.4", "R8.1", "R8.2"]
-    for i, est in enumerate(estadios, 2):
-        ws_bd.cell(row=i, column=7, value=est)
-    
-    # ============================================================
-    # ABA 2: Total_Pr (Dados Consolidados)
-    # ============================================================
-    ws_total = wb.create_sheet("Total_Pr")
-    
-    # Configurar estilos
-    titulo_fill = PatternFill(start_color="2c5f2d", end_color="2c5f2d", fill_type="solid")
-    titulo_font = Font(color="FFFFFF", bold=True)
-    sub_fill = PatternFill(start_color="e9ecef", end_color="e9ecef", fill_type="solid")
-    
-    # LINHA 4: Títulos principais (mesclados)
-    titulos_principais = [
-        (1, 3, "PLANILHA TABULAÇÃO DADOS QUESTIONÁRIOS APLICAÇÃO DEFENSIVOS PARA CONTROLE PRAGAS E DOENÇAS_PR_SAFRA 19_20_V1"),
-        (4, 6, ""),
-        (7, 15, "CONHECIMENTO MONITORAMENTO"),
-        (16, 19, "3_Informação Plantas Invasoras"),
-        (20, 24, "4.0_INFORMAÇÃO _PULVERIZAÇÃO DESSECAÇÃO"),
-        (25, 29, "4.1_INFORMAÇÃO _PRIMEIRA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (30, 34, "4.2_INFORMAÇÃO _SEGUNDA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (35, 39, "4.3_INFORMAÇÃO _TERCEIRA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (40, 44, "4.4_INFORMAÇÃO _QUARTA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (45, 49, "4.5_INFORMAÇÃO _QUINTA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (50, 54, "4.6_INFORMAÇÃO _SEXTA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (55, 59, "4.7_INFORMAÇÃO _SÉTIMA PULVERIZAÇÃO APÓS EMERGÊNCIA"),
-        (60, 62, "5.OUTRAS INFORMAÇÕES"),
-        (63, 63, "6.INOCULAÇÃO"),
-    ]
-    
-    for inicio, fim, titulo in titulos_principais:
-        ws_total.merge_cells(start_row=4, start_column=inicio, end_row=4, end_column=fim)
-        celula = ws_total.cell(row=4, column=inicio, value=titulo)
-        celula.fill = titulo_fill
-        celula.font = titulo_font
-        celula.alignment = Alignment(horizontal='center', vertical='center')
-    
-    # LINHA 5: Subtítulos (corrigido!)
-    subtitulos = [
-        "Tabela", "N° P", "Ordem", "", "Meso_IDR",
-        "Região", "Município", "Área com Soja (ha)", "Cultivar",
-        "Bt", "Produtividade Média (sc/ha)", "Data Plantio",
-        "Adversidade", "Sinistro", "Conhec. MID", "Utiliza MID",
-        "Conhec. MIP", "Utiliza MIP", "Classe do Produto",
-        "Alvo", "N° Aplicações", "Classe do Produto", "Alvo",
-        "N° Aplicações", "Classe do Produto", "Alvo",
-        "N° Aplicações", "Classe do Produto", "Alvo",
-        "N° Aplicações", "Pulverização na Dessecação", "Data",
-        "Classe do Produto", "Alvo_1", "Alvo_2", "Alvo_3",
-        # ... continue com todos os subtítulos
-    ]
-
-    for col, titulo in enumerate(subtitulos, 1):
-        if titulo:  # só preenche se não for string vazia
-            celula = ws_total.cell(row=5, column=col, value=titulo)
-            celula.fill = sub_fill
-    
-    # ============================================================
-    # POPULAR DADOS
-    # ============================================================
-    linha_atual = 7
-    for reg in registros:
-        # Col A: Tabela (ex: TB1, TB2...)
-        ws_total.cell(row=linha_atual, column=1, value=f"TB{linha_atual-6}.")
-        
-        # Col B: N° P
-        ws_total.cell(row=linha_atual, column=2, value=linha_atual-6)
-        
-        # Col C: Ordem (começa com 1 a cada nova tabela)
-        ws_total.cell(row=linha_atual, column=3, value=1)
-        
-        # Col D a G: Meso_IDR, Região, Município, Área
-        ws_total.cell(row=linha_atual, column=4, value=reg.meso_idr)
-        ws_total.cell(row=linha_atual, column=5, value=reg.regiao)
-        ws_total.cell(row=linha_atual, column=6, value=reg.municipio)
-        ws_total.cell(row=linha_atual, column=7, value=reg.area_soja)
-        
-        # Col H: Cultivar
-        ws_total.cell(row=linha_atual, column=8, value=reg.cultivar)
-        
-        # Col I: Bt
-        ws_total.cell(row=linha_atual, column=9, value=reg.bt)
-        
-        # Col J: Produtividade Média
-        ws_total.cell(row=linha_atual, column=10, value=reg.produtividade_media)
-        
-        # Col K: Data Plantio
-        ws_total.cell(row=linha_atual, column=11, value=reg.data_plantio)
-        
-        # Col L: Adversidade
-        ws_total.cell(row=linha_atual, column=12, value=reg.qual_adversidade)
-        
-        # Col M: Sinistro (se houve adversidade)
-        ws_total.cell(row=linha_atual, column=13, value="SIM" if reg.houve_adversidade == "SIM" else "")
-        
-        # Col N-P: Conhecimento MID/MIP
-        ws_total.cell(row=linha_atual, column=14, value=reg.conhecimento_mid)
-        ws_total.cell(row=linha_atual, column=15, value=reg.utiliza_mid)
-        ws_total.cell(row=linha_atual, column=16, value=reg.conhecimento_mip)
-        ws_total.cell(row=linha_atual, column=17, value=reg.utiliza_mip)
-        
-        # Col Q-S: Plantas invasoras
-        ws_total.cell(row=linha_atual, column=18, value=reg.herbicida_dessecacao_alvo)
-        ws_total.cell(row=linha_atual, column=19, value=reg.herbicida_dessecacao_aplicacoes)
-        ws_total.cell(row=linha_atual, column=20, value=reg.herbicida_pre_alvo)
-        ws_total.cell(row=linha_atual, column=21, value=reg.herbicida_pre_aplicacoes)
-        ws_total.cell(row=linha_atual, column=22, value=reg.herbicida_pos_alvo)
-        ws_total.cell(row=linha_atual, column=23, value=reg.herbicida_pos_aplicacoes)
-        
-        # Col T e seguintes: Pulverizações
-        col_pulv = 24
-        # Pré-plantio
-        for p in reg.pulverizacoes:
-            if p.tipo == 'pre_plantio':
-                ws_total.cell(row=linha_atual, column=col_pulv, value=p.classe_produto)
-                ws_total.cell(row=linha_atual, column=col_pulv+1, value=p.alvo)
-                col_pulv += 2
-        
-        # Pós-emergência (1 a 7)
-        for i in range(1, 8):
-            for p in reg.pulverizacoes:
-                if p.tipo == f'pos_{i}':
-                    ws_total.cell(row=linha_atual, column=col_pulv, value=p.classe_produto)
-                    ws_total.cell(row=linha_atual, column=col_pulv+1, value=p.alvo)
-                    col_pulv += 2
-                    break
-        
-        linha_atual += 1
-    
-    # ============================================================
-    # AJUSTAR LARGURA DAS COLUNAS
-    # ============================================================
-    for ws in [ws_bd, ws_total]:
-        for col in range(1, 100):
-            ws.column_dimensions[get_column_letter(col)].width = 15
-    
-    # ============================================================
-    # SALVAR E ENVIAR
-    # ============================================================
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
-    
-    return send_file(
-        output,
-        download_name=f'idr_soja_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx',
-        as_attachment=True,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_record(id):
     registro = FormularioSoja.query.get_or_404(id)
