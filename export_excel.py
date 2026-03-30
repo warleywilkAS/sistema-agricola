@@ -254,7 +254,7 @@ def orm_para_dict(r) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Definicao de colunas do BD
+# Definicao de colunas do Total_Pr
 # ---------------------------------------------------------------------------
 _ID_COLS = [
     ("N",            "N° Questionario",             "num"),
@@ -316,7 +316,7 @@ _INOC_COLS = [
     ("CoMo_Forma", "Forma Co+Mo",  "txt"),
 ]
 
-GRUPOS_BD = [
+GRUPOS_total_pr = [
     ("IDENTIFICACAO",              _ID_COLS),
     ("MONITORAMENTO MIP/MID",      _MID_COLS),
     ("3. PLANTAS INVASORAS",       _HERB_COLS),
@@ -327,17 +327,24 @@ GRUPOS_BD = [
 ]
 
 ALL_COLS: list[tuple] = []
-for _, cols in GRUPOS_BD:
+for _, cols in GRUPOS_total_pr:
     ALL_COLS.extend(cols)
 
 _CI: dict[str, int] = {c[0]: i + 1 for i, c in enumerate(ALL_COLS)}
 
-
 # ---------------------------------------------------------------------------
 # Aba BD
 # ---------------------------------------------------------------------------
-def _build_bd(wb, registros):
+
+def _build_BD(wb, registros):
     ws = wb.create_sheet("BD")
+    ws.sheet_view.showGridLines = False
+
+# ---------------------------------------------------------------------------
+# Aba Total_Pr
+# ---------------------------------------------------------------------------
+def _build_total_pr(wb, registros):
+    ws = wb.create_sheet("Total_Pr)
     ws.sheet_view.showGridLines = False
     nc = len(ALL_COLS)
 
@@ -349,7 +356,7 @@ def _build_bd(wb, registros):
     ws.row_dimensions[1].height = 28
 
     col = 1
-    for label, cols in GRUPOS_BD:
+    for label, cols in GRUPOS_total_pr:
         _hdr(ws, 2, col, label, _AZUL_MED, col + len(cols) - 1)
         col += len(cols)
 
@@ -484,7 +491,6 @@ def _calc(regs, tipo, param):
         return round(sum(ds) / len(ds), 1) if ds else 0
     return 0
 
-
 def _build_medias_geral(wb, registros):
     ws = wb.create_sheet("Medias_Geral")
     ws.sheet_view.showGridLines = False
@@ -606,6 +612,21 @@ def _build_contagem_pragas(wb, registros):
     _auto_width(ws, mn=5, mx=20)
     ws.freeze_panes = f"{get_column_letter(ni+1)}4"
 
+# ---------------------------------------------------------------------------
+# Aba Tabelas_Graficos_MIP
+# ---------------------------------------------------------------------------
+
+def _build_tabelas_graficos_mip(wb, registros):
+    ws = wb.create_sheet("Tabelas_Graficos_MIP")
+    ws.sheet_view.showGridLines = False
+
+# ---------------------------------------------------------------------------
+# Aba Custos_Inseticidas_real
+# ---------------------------------------------------------------------------
+
+def _build_custos_inseticidas_real(wb, registros):
+    ws = wb.create_sheet("Custos_Inseticidas_real")
+    ws.sheet_view.showGridLines = False
 
 # ---------------------------------------------------------------------------
 # Aba Contagem_Doencas
@@ -870,9 +891,12 @@ def gerar_excel(registros: list[dict],
     wb = Workbook()
     wb.remove(wb.active)
 
-    _build_bd(wb, registros)
+    _build_BD(wb, registros)
+    _build_total_pr(wb, registros)
     _build_medias_geral(wb, registros)
     _build_contagem_pragas(wb, registros)
+    _build_tabelas_graficos_mip(wb, registros)
+    _build_custos_inseticidas_real(wb, registros)
     _build_contagem_doencas(wb, registros)
     _build_tto_sal_cb(wb, registros)
     _build_fbn(wb, registros)
