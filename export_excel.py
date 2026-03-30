@@ -344,7 +344,7 @@ def _build_BD(wb, registros):
 # Aba Total_Pr
 # ---------------------------------------------------------------------------
 def _build_total_pr(wb, registros):
-    ws = wb.create_sheet("Total_Pr)
+    ws = wb.create_sheet("Total_Pr")
     ws.sheet_view.showGridLines = False
     nc = len(ALL_COLS)
 
