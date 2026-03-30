@@ -256,16 +256,19 @@ def orm_para_dict(r) -> dict:
 # Aba BD
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Aba BD
+# ---------------------------------------------------------------------------
+
 def _build_BD(wb, registros):
     ws = wb.create_sheet("BD")
     ws.sheet_view.showGridLines = False
     
-# Colunas
-
-headers = ["Doenças", "Bactérias", "Pragas", "Ácaros"]
-
-for col, header in enumerate(headers, start=1):
-     c = ws.cell(row=1, column=col, value=header)
+    # CABEÇALHOS DAS COLUNAS (apenas negrito, sem cor)
+    headers = ["Doenças", "Bactérias", "Pragas", "Ácaros"]
+    
+    for col, header in enumerate(headers, start=1):
+        c = ws.cell(row=1, column=col, value=header)
         c.font = Font(name="Arial", bold=True, size=9)
         c.alignment = _ctr()
         c.border = _brd()
@@ -298,7 +301,7 @@ for col, header in enumerate(headers, start=1):
         if row < len(acaros):
             _dat(ws, current_row, 4, acaros[row])
     
-    # ADICIONAR BORDAS
+    # ADICIONAR BORDAS (para todas as células com dados)
     for row in range(1, max_len + 2):
         for col in range(1, 5):
             if row == 1:
