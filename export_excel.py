@@ -252,6 +252,68 @@ def orm_para_dict(r) -> dict:
 
     return d
 
+# ---------------------------------------------------------------------------
+# Aba BD
+# ---------------------------------------------------------------------------
+
+def _build_BD(wb, registros):
+    ws = wb.create_sheet("BD")
+    ws.sheet_view.showGridLines = False
+    
+# Colunas
+
+headers = ["Doenças", "Bactérias", "Pragas", "Ácaros"]
+
+for col, header in enumerate(header, start=1):
+     c = ws.cell(row=1, column=col, value=header)
+        c.font = Font(name="Arial", bold=True, size=9)
+        c.alignment = _ctr()
+        c.border = _brd()
+    
+    # Filtrar pragas para excluir ácaros
+    pragas_sem_acaros = [p for p in PRAGAS if "Acaro" not in p]
+    acaros = [p for p in PRAGAS if "Acaro" in p]
+    
+    # Encontrar o maior comprimento entre as listas
+    max_len = max(len(DOENCAS_FUNGICAS), len(DOENCAS_BACT), 
+                  len(pragas_sem_acaros), len(acaros))
+    
+    # PREENCHER OS DADOS
+    for row in range(max_len):
+        current_row = row + 2  # Começa na linha 2 (abaixo do cabeçalho)
+        
+        # Coluna A - Doenças
+        if row < len(DOENCAS_FUNGICAS):
+            _dat(ws, current_row, 1, DOENCAS_FUNGICAS[row])
+        
+        # Coluna B - Bactérias
+        if row < len(DOENCAS_BACT):
+            _dat(ws, current_row, 2, DOENCAS_BACT[row])
+        
+        # Coluna C - Pragas
+        if row < len(pragas_sem_acaros):
+            _dat(ws, current_row, 3, pragas_sem_acaros[row])
+        
+        # Coluna D - Ácaros
+        if row < len(acaros):
+            _dat(ws, current_row, 4, acaros[row])
+    
+    # ADICIONAR BORDAS
+    for row in range(1, max_len + 2):
+        for col in range(1, 5):
+            if row == 1:
+                # Cabeçalho já tem borda
+                continue
+            ws.cell(row, col).border = _brd()
+    
+    # AJUSTAR LARGURA DAS COLUNAS
+    ws.column_dimensions['A'].width = 45
+    ws.column_dimensions['B'].width = 45
+    ws.column_dimensions['C'].width = 45
+    ws.column_dimensions['D'].width = 35
+    
+    # CONGELAR PAINEL NO CABEÇALHO
+    ws.freeze_panes = "A2"
 
 # ---------------------------------------------------------------------------
 # Definicao de colunas do Total_Pr
@@ -331,14 +393,6 @@ for _, cols in GRUPOS_total_pr:
     ALL_COLS.extend(cols)
 
 _CI: dict[str, int] = {c[0]: i + 1 for i, c in enumerate(ALL_COLS)}
-
-# ---------------------------------------------------------------------------
-# Aba BD
-# ---------------------------------------------------------------------------
-
-def _build_BD(wb, registros):
-    ws = wb.create_sheet("BD")
-    ws.sheet_view.showGridLines = False
 
 # ---------------------------------------------------------------------------
 # Aba Total_Pr
