@@ -264,7 +264,7 @@ def _build_BD(wb, registros):
 
 headers = ["Doenças", "Bactérias", "Pragas", "Ácaros"]
 
-for col, header in enumerate(header, start=1):
+for col, header in enumerate(headers, start=1):
      c = ws.cell(row=1, column=col, value=header)
         c.font = Font(name="Arial", bold=True, size=9)
         c.alignment = _ctr()
